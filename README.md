@@ -32,12 +32,13 @@ Press ```ctrl+a+x``` to exit.
 
 ## Running
 
-![import and run](import-and-run.png)
 In MicroPython REPL write:
 ```
 from os import smolOS
 smolOS()
 ```
+
+![import and run](import-and-run.png)
 
 ## Using
 ![Welcome screen](welcome.png)
