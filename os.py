@@ -1,6 +1,6 @@
-# smolOS by KryzszotKrystian Jankowski
+# smolOS by Krzysztof Krystian Jankowski
 # from smol import smolOS
-# smolOS()
+# (c)2023.07 KKJ^P1X
 import machine
 import uos
 
