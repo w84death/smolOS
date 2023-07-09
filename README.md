@@ -2,6 +2,11 @@
 smolOS for MicroPython (ESP8266)
 ![smolOS](welcome.png)
 
+Features:
+- easy to use
+- listing and removing files
+- simple text editor
+
 ## Install
 ### Requiments
 ```
