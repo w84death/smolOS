@@ -7,11 +7,10 @@ import uos
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.2b"
+        self.version = "0.2c"
         self.files = uos.listdir()
 
-        # USER FUNCTIONS
-        self.functions = {
+        self.user_commands = {
             "welcome": self.welcome,
             "about": self.welcome,
             "help": self.help,
@@ -24,7 +23,6 @@ class smolOS:
             "cls": self.cls
         }
 
-        # RUN THE SYSTEM
         self.boot()
 
     def boot(self):
@@ -36,12 +34,12 @@ class smolOS:
             parts = user_input.split()
             if len(parts) > 0:
                 command = parts[0]
-                if command in self.functions:
+                if command in self.user_commands:
                     if len(parts) > 1:
                         arguments = parts[1:]
-                        self.functions[command](*arguments)
+                        self.user_commands[command](*arguments)
                     else:
-                        self.functions[command]()
+                        self.user_commands[command]()
                 else:
                     self.unknown_function()
 
@@ -54,6 +52,7 @@ class smolOS:
         print("smolInfo: Type [help] for smol manual.\n")
 
     def help(self):
+        print(self.name+ " V"+self.version+" user commands:\n")
         print("ls - list files\ncat filename - print file\nrm filename - remove file\ned filename - text editor\nwelcome - welcome screen\ncls - clear screen\n")
 
     def unknown_function(self):
@@ -83,8 +82,9 @@ class smolOS:
             print("smolError: Failed to remove the file.")
 
     def ed(self, filename=""):
+        self.edversion="0.3"
         self.cls()
-        print("Welcome to smolEDitor\n\n[h] for help\n[q] to quit\n")
+        print("Welcome to smolEDitor\n\nWrite h for help\nq to quit\n")
         try:
             with open(filename, 'r+') as file:
                 print("Editing "+filename+" file")
@@ -93,7 +93,6 @@ class smolOS:
                 start_index = 0
 
                 while True:
-                    self.cls()
                     if start_index < line_count:
                         end_index = min(start_index + 10, line_count)
                         print_lines = lines[start_index:end_index]
@@ -101,19 +100,23 @@ class smolOS:
                         # Print the lines with line numbers
                         for line_num, line in enumerate(print_lines, start=start_index + 1):
                             print("{}: {}".format(line_num, line.strip()))
-                    user_ed_input = input("ed $: ")
+                    user_ed_input = input("\ned $: ")
 
                     if user_ed_input == "q":
                         break
 
                     if user_ed_input == "h":
-                        print("smolEDitor V0.1\n\nn - next 10 lines\nb - back 10 lines\n1 Hello, World - replacing first line\nw - write to file\nh - this help\nq - quit")
+                        print("smolEDitor V"+self.edversion+"\n\nn - next 10 lines\nb - back 10 lines\n1 Hello, World - replacing first line\na - add new line\nw - write to file\nh - this help\nq - quit")
+
+                    if user_ed_input == "a":
+                        lines_count += 11
 
                     if user_ed_input == "n":
                         if start_index+10 < line_count:
                             start_index += 10
                         else:
                             print("smolError: out of lines in this file.")
+
                     if user_ed_input == "b":
                         if start_index-10 >= 0:
                             start_index -= 10
@@ -134,8 +137,6 @@ class smolOS:
                             print("smolError: Invalid line number.")
                     else:
                         print("smolError: Invalid input format.")
-
-
 
         except OSError:
             print("smolError: Failed to open the file.")
