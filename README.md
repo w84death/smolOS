@@ -1,5 +1,6 @@
 # smolOS
 smolOS for MicroPython (ESP8266)
+![smolOS](welcome.png)
 
 ## Install
 ### Requiments
