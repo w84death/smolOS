@@ -44,12 +44,19 @@ class smolOS:
                     self.unknown_function()
 
     def welcome(self):
-        print("\n\n\n\n\033[12C"+self.name+ " V"+self.version+"\n\033[12C-------------------------------\n")
-        print("\033[12CMicroPython:", uos.uname().release)
-        print("\033[12CFirmware:", uos.uname().version)
-        print("\033[12CCPU Speed:", machine.freq()*0.000001, "MHz")
+        print("\n\n\n\n")
+        print("                            _  ___  ____   ")
+        print("        ___ _ __ ___   ___ | |/ _ \/ ___|  ")
+        print("       / __| '_ ` _ \ / _ \| | | | \___ \  ")
+        print("       \__ | | | | | | (_) | | |_| |___) | ")
+        print(" [..]  |___|_| |_| |_|\___/|_|\___/|____/  ")
+        print(" __________________________________________")
+        print("\n\033[7C"+self.name+ " Version "+self.version)
+        print("\033[7CMicroPython:", uos.uname().release)
+        print("\033[7CFirmware:", uos.uname().version)
+        print("\033[7CCPU Speed:", machine.freq()*0.000001, "MHz")
         print("\n\n\n")
-        print("smolInfo: Type [help] for smol manual.\n")
+        print("smolInfo: Type [help] for smol manual.\n\n\n")
 
     def help(self):
         print(self.name+ " V"+self.version+" user commands:\n")
