@@ -7,7 +7,7 @@ import uos
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.2c"
+        self.version = "0.2d"
         self.files = uos.listdir()
 
         self.user_commands = {
@@ -20,13 +20,19 @@ class smolOS:
             "cat": self.cat,
             "rm": self.rm,
             "ed": self.ed,
-            "cls": self.cls
+            "cls": self.cls,
+            "clear": self.cls
         }
 
         self.boot()
 
+    def set_cpu_freq(self, freq):
+        if freq > 1 and freq < 160:
+            machine.freq(freq * 1000000)
+        else:
+            print("smolError: wrong CPU frequency. Use between 40 and 160 MHz.")
     def boot(self):
-        machine.freq(160000000)
+        self.set_cpu_freq(80)
         self.cls()
         self.welcome()
         while True:
@@ -45,12 +51,13 @@ class smolOS:
 
     def welcome(self):
         print("\n\n\n\n")
-        print("                            _  ___  ____   ")
-        print("        ___ _ __ ___   ___ | |/ _ \/ ___|  ")
-        print("       / __| '_ ` _ \ / _ \| | | | \___ \  ")
-        print("       \__ | | | | | | (_) | | |_| |___) | ")
-        print(" [..]  |___|_| |_| |_|\___/|_|\___/|____/  ")
-        print(" __________________________________________")
+        print("______________________________________________")
+        print("                                 ______  _____")
+        print("           _________ ___  ____  / / __ \/ ___/")
+        print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
+        print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
+        print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
+        print("==============================================")
         print("\n\033[7C"+self.name+ " Version "+self.version)
         print("\033[7CMicroPython:", uos.uname().release)
         print("\033[7CFirmware:", uos.uname().version)
@@ -148,3 +155,4 @@ class smolOS:
         except OSError:
             print("smolError: Failed to open the file.")
 
+smol = smolOS()
