@@ -1,6 +1,6 @@
 # smolOS
 smolOS for MicroPython (ESP8266)
-![smolOS](welcome.png)
+![smolOS](smolos.png)
 
 Features:
 - easy to use
@@ -51,12 +51,12 @@ As normal user:
 ```
 $ picocom /dev/ttyUSB0 -b115200
 ```
-Press ```ctrl+a x``` to exit.
+Press ```ctrl+a+x``` to exit.
 
 ## Running
 
 
-First start. Restart the microcontroller:
+First start. Or after flashing new main.py file. Restart the microcontroller:
 ```
 >>> machine.soft_reset()
 ```
@@ -91,17 +91,24 @@ smolInfo: Type [help] for smol manual.
 smol $:
 ```
 
+
+![import and run](reset.png)
+
 In MicroPython REPL write:
 ```
 >>> smolOS()
 ```
 
-![import and run](import-and-run.png)
-
 ## Using
-![Welcome screen](welcome.png)
+![Welcome screen](smolos.png)
 
 Write help for help :)
 
-### Example session
-![Commands](commands.png)
+### Example user session
+![Sample user session](commands.png)
+
+### smolEDitor
+First application! Very early alpha at this point.
+
+![smolEDitor session](smoleditor.png)
+

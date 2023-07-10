@@ -3,36 +3,30 @@
 # (c)2023.07 KKJ^P1X
 import machine
 import uos
+import gc
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.2d"
+        self.version = "0.3"
         self.files = uos.listdir()
-
+        self.protected_files = { "boot.py",  "main.py" }
         self.user_commands = {
             "welcome": self.welcome,
-            "about": self.welcome,
             "help": self.help,
-            "manual": self.help,
-            "man": self.help,
             "ls": self.ls,
             "cat": self.cat,
             "rm": self.rm,
             "ed": self.ed,
             "cls": self.cls,
-            "clear": self.cls
+            "mhz": self.set_cpu_mhz,
+            "info": self.info
         }
 
         self.boot()
 
-    def set_cpu_freq(self, freq):
-        if freq > 1 and freq < 160:
-            machine.freq(freq * 1000000)
-        else:
-            print("smolError: wrong CPU frequency. Use between 40 and 160 MHz.")
     def boot(self):
-        self.set_cpu_freq(80)
+        self.set_cpu_mhz(80)
         self.cls()
         self.welcome()
         while True:
@@ -58,19 +52,34 @@ class smolOS:
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
         print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
         print("==============================================")
-        print("\n\033[7C"+self.name+ " Version "+self.version)
-        print("\033[7CMicroPython:", uos.uname().release)
-        print("\033[7CFirmware:", uos.uname().version)
-        print("\033[7CCPU Speed:", machine.freq()*0.000001, "MHz")
-        print("\n\n\n")
-        print("smolInfo: Type [help] for smol manual.\n\n\n")
+        print("\n")
+        self.info()
+        print("\n\n\n\n")
+        print("smolInfo: Type 'help' for a smol manual.\n\n")
 
     def help(self):
-        print(self.name+ " V"+self.version+" user commands:\n")
-        print("ls - list files\ncat filename - print file\nrm filename - remove file\ned filename - text editor\nwelcome - welcome screen\ncls - clear screen\n")
+        print(self.name+ " Version "+self.version+" user commands:\n")
+        print("ls - list files\ncat filename - print file\nrm filename - remove file\ned filename - text editor\nwelcome - welcome screen\ncls - clear screen\nmhz 160 - set CPU speed (80-160) in MHz\ninfo - hardware and software information")
+        print("\nSystem created by Krzysztof Krystian Jankowski")
+        print("Code available at github and smol.p1x.in/os/")
 
     def unknown_function(self):
-        print("smolError: huh?")
+        print("smolError: unknown function. Try 'help'.")
+
+    def set_cpu_mhz(self, freq="80"):
+        freq = int(freq)
+        if freq >= 80 and freq <= 160:
+            machine.freq(freq * 1000000)
+        else:
+            print("smolError: wrong CPU frequency. Use between 80 and 160 MHz.")
+
+    def info(self):
+        print(self.name + ":" + self.version)
+        print("MicroPython:", uos.uname().release)
+        print("Firmware:", uos.uname().version)
+        print("CPU Speed:", machine.freq()*0.000001, "MHz")
+        print("Free memory:", gc.mem_free(), "bytes")
+        print("Free space:", uos.statvfs("/")[0] * uos.statvfs("/")[2], "bytes")
 
     def cls(self):
          print("\033[2J")
@@ -78,7 +87,10 @@ class smolOS:
     def ls(self):
         self.files = uos.listdir()
         for file in self.files:
-            print(file)
+            file_size = uos.stat(file)[6]
+            info = ""
+            if file in self.protected_files: info = "protected system file"
+            print(file,"\t", file_size, "bytes", "\t"+info)
 
     def cat(self, filename):
         try:
@@ -90,8 +102,11 @@ class smolOS:
 
     def rm(self, filename):
         try:
-            uos.remove(filename)
-            print("smolInfo: File '{}' removed successfully.".format(filename))
+            if filename in self.protected_files:
+                print("smolError: Can not remove system file!")
+            else:
+                uos.remove(filename)
+                print("smolInfo: File '{}' removed successfully.".format(filename))
         except OSError:
             print("smolError: Failed to remove the file.")
 
