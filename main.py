@@ -8,7 +8,7 @@ import gc
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.3a"
+        self.version = "0.3b"
         self.files = uos.listdir()
         self.protected_files = { "boot.py",  "main.py" }
         self.user_commands = {
@@ -20,6 +20,7 @@ class smolOS:
             "ed": self.ed,
             "cls": self.cls,
             "mhz": self.set_cpu_mhz,
+            "stats": self.stats,
             "info": self.info
         }
 
@@ -53,13 +54,13 @@ class smolOS:
         print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
         print("==============================================")
         print("\n")
-        self.info()
+        self.stats()
         print("\n\n\n\n")
         print("smolInfo: Type 'help' for a smol manual.\n\n")
 
     def help(self):
         print(self.name+ " Version "+self.version+" user commands:\n")
-        print("ls - list files\ncat filename - print file\nrm filename - remove file\ned filename - text editor\nwelcome - welcome screen\ncls - clear screen\nmhz 160 - set CPU speed (80-160) in MHz\ninfo - hardware and software information")
+        print("ls - list files\ncat filename - print file\ninfo filename - info about selected file\nrm filename - remove file\ned filename - text editor\nwelcome - welcome screen\ncls - clear screen\nmhz 160 - set CPU speed (80-160) in MHz\nstats - hardware and software information")
         print("\nSystem created by Krzysztof Krystian Jankowski")
         print("Code available at github and smol.p1x.in/os/")
 
@@ -73,8 +74,8 @@ class smolOS:
         else:
             print("smolError: wrong CPU frequency. Use between 80 and 160 MHz.")
 
-    def info(self):
-        print(self.name + ":", self.version)
+    def stats(self):
+        print(self.name + ":", self.version, "(size:", uos.stat("main.py")[6], "bytes)")
         print("MicroPython:", uos.uname().release)
         print("Firmware:", uos.uname().version)
         print("CPU Speed:", machine.freq()*0.000001, "MHz")
@@ -87,10 +88,13 @@ class smolOS:
     def ls(self):
         self.files = uos.listdir()
         for file in self.files:
-            file_size = uos.stat(file)[6]
-            info = ""
-            if file in self.protected_files: info = "protected system file"
-            print(file,"\t", file_size, "bytes", "\t"+info)
+            self.size(file)
+
+    def info(self, filename):
+        info = ""
+        file_size = uos.stat(filename)[6]
+        if file in self.protected_files: info = "protected system file"
+        print(file,"\t", file_size, "bytes", "\t"+info)
 
     def cat(self, filename):
         try:
