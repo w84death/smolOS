@@ -8,7 +8,7 @@ import gc
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.3"
+        self.version = "0.3a"
         self.files = uos.listdir()
         self.protected_files = { "boot.py",  "main.py" }
         self.user_commands = {
@@ -74,7 +74,7 @@ class smolOS:
             print("smolError: wrong CPU frequency. Use between 80 and 160 MHz.")
 
     def info(self):
-        print(self.name + ":" + self.version)
+        print(self.name + ":", self.version)
         print("MicroPython:", uos.uname().release)
         print("Firmware:", uos.uname().version)
         print("CPU Speed:", machine.freq()*0.000001, "MHz")
@@ -111,61 +111,69 @@ class smolOS:
             print("smolError: Failed to remove the file.")
 
     def ed(self, filename=""):
-        self.edversion="0.3"
+        self.edversion="0.5"
+        self.page_size = 10
         self.cls()
-        print("Welcome to smolEDitor\n\nWrite h for help\nq to quit\n")
+        print("Welcome to smolEDitor\n\nWrite h for help\nq to quit\n\n")
         try:
             with open(filename, 'r+') as file:
-                print("Editing "+filename+" file")
+                print("\nEditing "+filename+" file\n")
                 lines = file.readlines()
                 line_count = len(lines)
                 start_index = 0
 
                 while True:
                     if start_index < line_count:
-                        end_index = min(start_index + 10, line_count)
+                        end_index = min(start_index + self.page_size, line_count)
                         print_lines = lines[start_index:end_index]
+                        lines_left = line_count - start_index
 
-                        # Print the lines with line numbers
                         for line_num, line in enumerate(print_lines, start=start_index + 1):
                             print("{}: {}".format(line_num, line.strip()))
+
+                        if lines_left > 0:
+                            if lines_left <= self.page_size & start_index > 1:
+                                print("Last page. Type 'b' for previous page.", lines_left)
+                            else:
+                                if lines_left > self.page_size:
+                                    print("...", lines_left-self.page_size, "more line(s). Type 'n' for next page.")
+
                     user_ed_input = input("\ned $: ")
 
                     if user_ed_input == "q":
                         break
 
                     if user_ed_input == "h":
-                        print("smolEDitor V"+self.edversion+"\n\nn - next 10 lines\nb - back 10 lines\n1 Hello, World - replacing first line\na - add new line\nw - write to file\nh - this help\nq - quit")
+                        print("smolEDitor Version "+self.edversion+"\n\nn - next",self.page_size,"lines\nb - back",self.page_size,"lines\n1 Hello, World - replacing first line\na - add new line\nw - write to file\nh - this help\nq - quit\n")
 
                     if user_ed_input == "a":
-                        lines_count += 11
+                        line_count += 1
+                        lines.append("")
 
                     if user_ed_input == "n":
-                        if start_index+10 < line_count:
-                            start_index += 10
+                        if start_index+self.page_size < line_count:
+                            start_index += self.page_size
                         else:
-                            print("smolError: out of lines in this file.")
+                            print("\nsmolError: out of lines in this file.\n")
 
                     if user_ed_input == "b":
-                        if start_index-10 >= 0:
-                            start_index -= 10
+                        if start_index-self.page_size >= 0:
+                            start_index -= self.page_size
                         else:
-                            print("smolError: out of lines in this file.")
+                            print("\nsmolError: out of lines in this file.\n")
 
                     if user_ed_input == "w":
-                        print("smolWarning: Not implemented yet.")
+                        print("\nsmolWarning: Saving implemented yet.\n")
 
                     parts = user_ed_input.split(" ", 1)
                     if len(parts) == 2:
                         line_number = int(parts[0])
                         new_content = parts[1]
 
-                        if line_number > 0 and line_number <= line_count:
+                        if line_number > 0 and line_number < line_count:
                             lines[line_number - 1] = new_content + "\n"
                         else:
-                            print("smolError: Invalid line number.")
-                    else:
-                        print("smolError: Invalid input format.")
+                            print("\nsmolError: Invalid line number.\n")
 
         except OSError:
             print("smolError: Failed to open the file.")
