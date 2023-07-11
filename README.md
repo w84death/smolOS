@@ -1,5 +1,7 @@
 # smolOS
+
 smolOS for MicroPython (ESP8266)
+
 ![smolOS](smolos.png)
 
 Features:
