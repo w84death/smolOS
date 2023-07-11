@@ -1,6 +1,7 @@
 # smolOS by Krzysztof Krystian Jankowski
-# from smol import smolOS
-# (c)2023.07 KKJ^P1X
+# Homepage: http://smol.p1x.in/os/
+# Source version: 0.3b at 2023.07.10
+#
 import machine
 import uos
 import gc
