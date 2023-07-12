@@ -1,13 +1,23 @@
 # smolOS
 
-smolOS for MicroPython (ESP8266)
+smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266 and RP2040) giving the user POSIX-like environment to play.
 
-![smolOS](smolos.png)
+![smolOS](media/smolos.png)
 
-Features:
-- easy to use
-- listing and removing files
-- simple text editor
+- [smolOS homepage (http)](http://smol.p1x.in/os/)
+- [smolOS homepage (https)](https://smol.p1x.in/os/)
+
+
+## smolOS Features
+
+* Changes ESP8266 into a small working PC
+* Homemade for fun and learning
+* Super small and fast
+* Easy to use, simillar to MS-DOS, POSIX-like environment
+* List and manipulates files
+* Text editor included (basic)
+* Ability to view and edit the OS code in runtime
+* Build on MicroPython
 
 ## Install
 ### Requiments
@@ -94,7 +104,7 @@ smol $:
 ```
 
 
-![import and run](reset.png)
+![import and run](media/reset.png)
 
 In MicroPython REPL write:
 ```
@@ -102,15 +112,19 @@ In MicroPython REPL write:
 ```
 
 ## Using
-![Welcome screen](smolos.png)
+![Welcome screen](media/smolos.png)
 
-Write help for help :)
+Write `help` for help :)
 
 ### Example user session
-![Sample user session](commands.png)
+![Sample user session](media/commands.png)
 
 ### smolEDitor
-First application! Very early alpha at this point.
+First application: `ed`! Almost complete but very simple text editor.
 
-![smolEDitor session](smoleditor.png)
+![smolEDitor session](media/smoleditor.png)
 
+
+## Articles
+- [hackster.io](https://www.hackster.io/news/krzysztof-jankowski-s-micropython-based-smolos-puts-a-tiny-posix-like-environment-on-your-esp8266-0c776559152b)
+- [cnx-software.com](https://www.cnx-software.com/2023/07/12/smolos-brings-a-linux-like-command-line-interface-to-esp8266-microcontroller/)
