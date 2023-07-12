@@ -56,7 +56,7 @@ class smolOS:
 
     def welcome(self):
         print("\n\n\n\n")
-        self.banner(self)
+        self.banner()
         print("\n")
         self.stats()
         print("\n\n\n\n")
@@ -99,13 +99,13 @@ class smolOS:
     def ls(self):
         self.files = uos.listdir()
         for file in self.files:
-            self.size(file)
+            self.info(file)
 
     def info(self,filename):
         info = ""
         file_size = uos.stat(filename)[6]
-        if file in self.protected_files: info = "protected system file"
-        print(file,"\t",file_size,"bytes","\t"+info)
+        if filename in self.protected_files: info = "protected system file"
+        print(filename,"\t",file_size,"bytes","\t"+info)
 
     def cat(self,filename):
         try:
@@ -164,7 +164,7 @@ class smolOS:
                         break
 
                     if user_ed_input in ("h","help"):
-                        message = "smolEDitor Version "+self.edversion+"\n\n`n` - next",self.page_size,"lines\n`b` - back",self.page_size,"lines\n`n text` - replacing n line with a text\n`a`,`add` - add new line\n`w`,`write`,'save' - write to file\nh - this help\nq - quit\n"
+                        message = "\nsmolEDitor Version "+self.edversion+"\n\n`n` - next "+str(self.page_size)+" lines\n`b` - back "+str(self.page_size)+" lines\n`n text` - replacing n line with a text\n`a`,`add` - add new line\n`w`,`write`,'save' - write to file\n`h` - this help\n`q` - quit\n"
 
                     if user_ed_input in ("a","add"):
                         line_count += 1
@@ -183,7 +183,7 @@ class smolOS:
                             error = "out of lines in this file."
 
                     if user_ed_input in ("w","write","save"):
-                        error = "Saving implemented yet"
+                        error = "Saving not implemented yet"
 
                     parts = user_ed_input.split(" ",1)
                     if len(parts) == 2:
