@@ -48,6 +48,7 @@ $ esptool.py --port /dev/ttyUSB0 --baud 115200 write_flash --flash_size=detect -
 - write_flash flashes the MicroPython firmware
 
 ### pushing OSs
+**Rename downloaded sources to main.py**
 ```
 $ ampy --port /dev/ttyUSB0 put main.py
 $ ampy --port /dev/ttyUSB0 put hello.txt
