@@ -9,7 +9,7 @@ import gc
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.4"
+        self.version = "0.4a"
         self.files = uos.listdir()
         self.protected_files = { "boot.py", "main.py" }
         self.user_commands = {
