@@ -132,8 +132,7 @@ class smolOS:
             self.print_msg("File '{}' removed successfully.".format(filename))
 
     # smolEDitor
-    # A smol text editor for smol operating system
-    def ed(self,filename=""):
+    # Minimum viable text editor
         self.edversion="0.5"
         self.page_size = 10
         self.cls()
@@ -170,7 +169,7 @@ class smolOS:
                         break
 
                     if user_ed_input in ("h","help"):
-                        message = "smolEDitor Version "+self.edversion+"\n\n`n` - next",self.page_size,"lines\n`b` - back",self.page_size,"lines\n`n text` - replacing n line with a text\n`a`,`add` - add new line\n`w`,`write`,'save' - write to file\nh - this help\nq - quit\n"
+                        message = "smolEDitor minimum viable text editor\n\n`n` - next",self.page_size,"lines\n`b` - back",self.page_size,"lines\n`n text` - replacing n line with a text\n`a`,`add` - add new line\n`w`,`write`,'save' - write to file\n`h` - this help\n`q` - quit\n"
 
                     if user_ed_input in ("a","add"):
                         line_count += 1
