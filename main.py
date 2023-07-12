@@ -56,7 +56,7 @@ class smolOS:
 
     def welcome(self):
         print("\n\n\n\n")
-        self.banner(self)
+        self.banner()
         print("\n")
         self.stats()
         print("\n\n\n\n")
@@ -65,7 +65,7 @@ class smolOS:
 
     def help(self):
         print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information\n\t`reboot` - reboot the system")
+        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information")
         print("\nSystem created by Krzysztof Krystian Jankowski")
         print("Code available at github and smol.p1x.in/os/")
 
@@ -97,33 +97,39 @@ class smolOS:
          print("\033[2J")
 
     def ls(self):
-        self.files = uos.listdir()
-        for file in self.files:
-            self.size(file)
+        for file in uos.listdir():
+            file_size = uos.stat(file)[6]
+            additional = ""
+            if file in self.protected_files: info = "protected system file"
+            print(file,"\t", file_size, "bytes", "\t"+additional)
 
-    def info(self,filename):
-        info = ""
+    def info(self,filename=""):
+        if filename == "":
+            self.print_err("No file")
+            return
+        additional = ""
         file_size = uos.stat(filename)[6]
-        if file in self.protected_files: info = "protected system file"
-        print(file,"\t",file_size,"bytes","\t"+info)
+        if filename in self.protected_files: additional = "protected system file"
+        print(filename,"\t",file_size,"bytes","\t"+additional)
 
-    def cat(self,filename):
-        try:
-            with open(filename,'r') as file:
-                content = file.read()
-                print(content)
-        except OSError:
+
+    def cat(self,filename=""):
+        if filename == "":
             self.print_err("Failed to open the file.")
+            return
+        with open(filename,'r') as file:
+            content = file.read()
+            print(content)
 
-    def rm(self,filename):
-        try:
-            if filename in self.protected_files:
-                self.print_err("Can not remove system file!")
-            else:
-                uos.remove(filename)
-                self.print_msg("File '{}' removed successfully.".format(filename))
-        except OSError:
+    def rm(self,filename=""):
+        if filename == "":
             self.print_err("Failed to remove the file.")
+            return
+        if filename in self.protected_files:
+            self.print_err("Can not remove system file!")
+        else:
+            uos.remove(filename)
+            self.print_msg("File '{}' removed successfully.".format(filename))
 
     # smolEDitor
     # A smol text editor for smol operating system
@@ -196,6 +202,9 @@ class smolOS:
                             error = "Invalid line number."
 
         except OSError:
-            print("\n\t<!> Failed to open the file. <!>")
+            if filename == "":
+                self.print_err("Provide an existing file name after the `ed` command.")
+            else:
+                self.print_err("Failed to open the file.")
 
 smol = smolOS()
