@@ -47,7 +47,7 @@ class smolOS:
 
     def banner(self):
         print("______________________________________________")
-        print("               esp 32/8266       ______  _____")
+        print("               esp 8266       ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
@@ -78,12 +78,14 @@ class smolOS:
     def unknown_function(self):
         self.print_err("unknown function. Try 'help'.")
 
-    def set_cpu_mhz(self,freq="80"):
+    def set_cpu_mhz(self,freq="0"):
         freq = int(freq)
-        if freq != 80 or freq != 160:
-            self.print_err("wrong CPU frequency. Use 80 or 160 MHz.")
+
+        if freq == 80 or freq == 160:
+            machine.freq(freq  * 1000000)
+            
         else:
-            machine.freq(freq * 1000000)
+            self.print_err("wrong CPU frequency. Use 80 or 160 MHz.")
 
     def stats(self):
         print(self.name + ":",self.version,"(size:",uos.stat("main.py")[6],"bytes)")

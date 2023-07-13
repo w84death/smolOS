@@ -32,9 +32,7 @@ $ pip install esp-tool adafruit-ampy
 ### Flashing MicroPython on ESP8266
 Remember to ground PIN 0 for flash mode. I've added a push button to the UART-to-USB dongle for that. I then push it while plugging in.
 
-Get the latest firmware from [MicroPython Download Page for ESP8266 1MB](https://micropython.org/download/esp8266-1m/). That's the chip I got.
-
-In the time of writeing this was the latest file: esp8266-1m-20230426-v1.20.0.bin.
+Get the latest firmware port from [MicroPython Download Page](https://micropython.org/download/?port=esp8266). Find right version for your esp chip.
 
 As super user.
 
