@@ -6,12 +6,13 @@
 import machine
 import uos
 import gc
+import utime
 from ws2812 import WS2812
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.5-xiao"
+        self.version = "0.4d-xiao"
         self.turbo = False
         self.files = uos.listdir()
         self.protected_files = { "boot.py", "main.py" }
@@ -35,7 +36,10 @@ class smolOS:
 
     def boot(self):
         self.set_cpu_mhz(133)
+        self.power = machine.Pin(11,machine.Pin.OUT)
+        self.power.value(1)
         self.led_pixel = WS2812(12,1)
+        self.led("boot")
         self.cls()
         self.welcome()
         while True:
@@ -155,13 +159,25 @@ class smolOS:
 
     def led(self,rgb_color=""):
         if rgb_color=="":
-            print("Rainbow!")
+            self.print_msg("Rainbow!")
             self.led_pixel.rainbow_cycle(0.001)
-        else:
-            print("LED set to"+rgb_color)
-            color = tuple(map(int, rgb_color.split(',')))
-            self.led_pixel.pixels_fill(color)
+            return
+        if rgb_color=="boot":
+            for _ in range(4):
+                self.led_pixel.pixels_fill((255,22,22))
+                self.led_pixel.pixels_show()
+                utime.sleep(0.1)
+                self.led_pixel.pixels_fill((32,5,5))
+                self.led_pixel.pixels_show()
+                utime.sleep(0.05)
+            self.led_pixel.pixels_fill((255,22,22))
             self.led_pixel.pixels_show()
+            return
+
+        color = tuple(map(int, rgb_color.split(',')))
+        self.print_msg("LED set to: "+rgb_color)
+        self.led_pixel.pixels_fill(color)
+        self.led_pixel.pixels_show()
 
     # smolEDitor
     # Minimum viable text editor
