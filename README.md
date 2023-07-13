@@ -2,8 +2,10 @@
 
 smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266 and RP2040) giving the user POSIX-like environment to play.
 
+
 ![smolOS](media/smolos.png)
 
+Latest documentattion available at official homepage:
 - [smolOS homepage (http)](http://smol.p1x.in/os/)
 - [smolOS homepage (https)](https://smol.p1x.in/os/)
 
@@ -48,6 +50,7 @@ $ esptool.py --port /dev/ttyUSB0 --baud 115200 write_flash --flash_size=detect -
 - write_flash flashes the MicroPython firmware
 
 ### pushing OSs
+**Rename downloaded sources to main.py**
 ```
 $ ampy --port /dev/ttyUSB0 put main.py
 $ ampy --port /dev/ttyUSB0 put hello.txt
