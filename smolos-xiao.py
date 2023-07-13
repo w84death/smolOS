@@ -1,15 +1,17 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
-# Source version: 0.4c modified at 2023.07.13
+# Source version: 0.4c-xiao modified at 2023.07.13
+
 
 import machine
 import uos
 import gc
+from ws2812 import WS2812
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.4d"
+        self.version = "0.5-xiao"
         self.turbo = False
         self.files = uos.listdir()
         self.protected_files = { "boot.py", "main.py" }
@@ -25,13 +27,15 @@ class smolOS:
             "turbo": self.toggle_turbo,
             "ed": self.ed,
             "info": self.info,
-            "py": self.py
+            "py": self.py,
+            "led": self.led
         }
 
         self.boot()
 
     def boot(self):
-        self.set_cpu_mhz(80)
+        self.set_cpu_mhz(133)
+        self.led_pixel = WS2812(12,1)
         self.cls()
         self.welcome()
         while True:
@@ -55,7 +59,7 @@ class smolOS:
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
         print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
-        print("==============================================")
+        print("==============XIAO-RP2040-EDiTiON=============")
 
     def welcome(self):
         print("\n\n\n\n")
@@ -102,7 +106,7 @@ class smolOS:
         print(self.name + ":",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
         print("Firmware:",uos.uname().version)
         print("CPU Speed:",machine.freq()*0.000001,"MHz")
-        print("Free/All memory:",gc.mem_free(),"bytes","/", uos.statvfs("/")[1] * uos.statvfs("/")[2], "bytes")
+        print("Free memory:",gc.mem_free(),"bytes")
         print("Free space:",uos.statvfs("/")[0] * uos.statvfs("/")[2],"bytes")
 
     def cls(self):
@@ -148,6 +152,16 @@ class smolOS:
             self.print_err("Specify a file name to run.")
             return
         exec(open(filename).read())
+
+    def led(self,rgb_color=""):
+        if rgb_color=="":
+            print("Rainbow!")
+            self.led_pixel.rainbow_cycle(0.001)
+        else:
+            print("LED set to"+rgb_color)
+            color = tuple(map(int, rgb_color.split(',')))
+            self.led_pixel.pixels_fill(color)
+            self.led_pixel.pixels_show()
 
     # smolEDitor
     # Minimum viable text editor
@@ -225,4 +239,6 @@ class smolOS:
                 self.print_err("Failed to open the file.")
 
 smol = smolOS()
+
+
 
