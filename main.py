@@ -47,19 +47,19 @@ class smolOS:
 
     def banner(self):
         print("______________________________________________")
-        print("                                 ______  _____")
+        print("               esp 32/8266       ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
-        print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
+        print("        /____/_/ /_/ /_/\____/_/\____//____/  ")
         print("==============================================")
 
     def welcome(self):
-        print("\n\n\n\n")
+        print("\n")
         self.banner()
         print("\n")
         self.stats()
-        print("\n\n\n\n")
+        print("\n")
         self.print_msg("Type 'help' for a smol manual.")
         print("\n")
 
@@ -80,10 +80,10 @@ class smolOS:
 
     def set_cpu_mhz(self,freq="80"):
         freq = int(freq)
-        if freq >= 80 and freq <= 160:
-            machine.freq(freq * 1000000)
+        if freq != 80 or freq != 160:
+            self.print_err("wrong CPU frequency. Use 80 or 160 MHz.")
         else:
-            self.print_err("wrong CPU frequency. Use between 80 and 160 MHz.")
+            machine.freq(freq * 1000000)
 
     def stats(self):
         print(self.name + ":",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
@@ -133,6 +133,7 @@ class smolOS:
 
     # smolEDitor
     # Minimum viable text editor
+    def ed(self,filename=""):
         self.edversion="0.5"
         self.page_size = 10
         self.cls()
