@@ -5,11 +5,16 @@
 import machine
 import uos
 import gc
+import network
+import ubinascii
+
+wlan = network.WLAN(network.STA_IF)
+ap = network.WLAN(network.AP_IF)
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.4a"
+        self.version = "0.4b"
         self.files = uos.listdir()
         self.protected_files = { "boot.py", "main.py" }
         self.user_commands = {
@@ -22,7 +27,8 @@ class smolOS:
             "stats": self.stats,
             "mhz": self.set_cpu_mhz,
             "ed": self.ed,
-            "info": self.info
+            "info": self.info,
+            "swlan": self.swlan
         }
 
         self.boot()
@@ -51,7 +57,7 @@ class smolOS:
         print("           _________ ___  ____  / / __ \/ ___/")
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
-        print("        /____/_/ /_/ /_/\____/_/\____//____/  ")
+        print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
         print("==============================================")
 
     def welcome(self):
@@ -65,7 +71,7 @@ class smolOS:
 
     def help(self):
         print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` set CPU speed 80/160 MHz\n\t`stats` - hardware and software information")
+        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` set CPU speed 80/160 MHz\n\t`stats` - hardware and software information\n\t`swlan` - network utility")
         print("\nSystem created by Krzysztof Krystian Jankowski")
         print("Code available at github and smol.p1x.in/os/")
 
@@ -94,6 +100,7 @@ class smolOS:
         print("CPU Speed:",machine.freq()*0.000001,"MHz")
         print("Free memory:",gc.mem_free(),"bytes")
         print("Free space:",uos.statvfs("/")[0] * uos.statvfs("/")[2],"bytes")
+        print("MAC:", print(ubinascii.hexlify(wlan.config('mac')).decode().upper()))
 
     def cls(self):
          print("\033[2J")
@@ -208,5 +215,48 @@ class smolOS:
                 self.print_err("Provide an existing file name after the `ed` command.")
             else:
                 self.print_err("Failed to open the file.")
+
+    ## wifi utiity
+    def swlan(self, arg=""):
+        if arg == "help" or arg == "":
+            print("\n smolOS wifi utility\n\n help - prints this message\n status - current network status\n wlan - client utility")
+        if arg == "status":
+            print("\n Station interface:", wlan.active())
+            if wlan.active():
+                print(" Connected:        ", wlan.isconnected())
+                if wlan.isconnected():
+                    print(" SSID:             ", wlan.config('ssid'))
+
+            print("\n AP interface      ", ap.active())
+            if ap.active(): print(" AP SSID:          ", ap.config('ssid'))
+
+        ## Add enable/disable, scan, connect, disconnect, hostname, phy_mode, 
+        if arg == "wlan": 
+            self.cls()
+            print(" wlan", wlan.active())
+            print("\n 1 - toggle wlan")
+            print(" 2 - scan networks")
+            print(" 3 - connect (config)")
+            print(" 4 - disconnect")
+            user_input = input("\n:: ")
+            if user_input in "1":
+                if wlan.active() == True:
+                    wlan.active(False)
+                    print("Disabled wlan")
+                else:
+                    wlan.active(True)
+                    print("Enabled wlan")
+            
+            if user_input in "2":
+                scan = wlan.scan()
+                ssid00 = scan[0][0].decode("utf-8")
+                print(scan)              
+                print(ssid00) ## just a test
+            
+        # if arg == "ap":
+
+        # else:
+        #     self.print_msg(" smolOS wifi utility\n help - prints this message\n status - current network status\n ")
+
 
 smol = smolOS()
