@@ -47,7 +47,7 @@ class smolOS:
 
     def banner(self):
         print("______________________________________________")
-        print("               esp 8266       ______  _____")
+        print("               esp 8266          ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
@@ -65,7 +65,7 @@ class smolOS:
 
     def help(self):
         print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information")
+        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` set CPU speed 80/160 MHz\n\t`stats` - hardware and software information")
         print("\nSystem created by Krzysztof Krystian Jankowski")
         print("Code available at github and smol.p1x.in/os/")
 
