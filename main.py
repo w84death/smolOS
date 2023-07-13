@@ -8,8 +8,9 @@ import gc
 import network
 import ubinascii
 
-wlan = network.WLAN(network.STA_IF)
-ap = network.WLAN(network.AP_IF)
+_wlan = network.WLAN(network.STA_IF)
+_ap = network.WLAN(network.AP_IF)
+
 
 class smolOS:
     def __init__(self):
@@ -28,7 +29,7 @@ class smolOS:
             "mhz": self.set_cpu_mhz,
             "ed": self.ed,
             "info": self.info,
-            "swlan": self.swlan
+            "svl": self.svl
         }
 
         self.boot()
@@ -71,7 +72,7 @@ class smolOS:
 
     def help(self):
         print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` set CPU speed 80/160 MHz\n\t`stats` - hardware and software information\n\t`swlan` - network utility")
+        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` set CPU speed 80/160 MHz\n\t`stats` - hardware and software information\n\t`svl` - network utility")
         print("\nSystem created by Krzysztof Krystian Jankowski")
         print("Code available at github and smol.p1x.in/os/")
 
@@ -100,7 +101,7 @@ class smolOS:
         print("CPU Speed:",machine.freq()*0.000001,"MHz")
         print("Free memory:",gc.mem_free(),"bytes")
         print("Free space:",uos.statvfs("/")[0] * uos.statvfs("/")[2],"bytes")
-        print("MAC:", print(ubinascii.hexlify(wlan.config('mac')).decode().upper()))
+        print("MAC:", ubinascii.hexlify(_wlan.config('mac')).decode().upper())
 
     def cls(self):
          print("\033[2J")
@@ -217,44 +218,74 @@ class smolOS:
                 self.print_err("Failed to open the file.")
 
     ## wifi utiity
-    def swlan(self, arg=""):
+    def svl(self, arg=""):
         if arg == "help" or arg == "":
             print("\n smolOS wifi utility\n\n help - prints this message\n status - current network status\n wlan - client utility")
         if arg == "status":
-            print("\n Station interface:", wlan.active())
-            if wlan.active():
-                print(" Connected:        ", wlan.isconnected())
-                if wlan.isconnected():
-                    print(" SSID:             ", wlan.config('ssid'))
+            print("\n Station interface:", _wlan.active())
+            if _wlan.active():
+                print(" Connected:        ", _wlan.isconnected())
+                if _wlan.isconnected():
+                    print(" SSID:             ", _wlan.config('ssid'))
 
-            print("\n AP interface      ", ap.active())
-            if ap.active(): print(" AP SSID:          ", ap.config('ssid'))
+            print("\n AP interface      ", _ap.active())
+            if _ap.active(): print(" AP SSID:          ", _ap.config('ssid'))
 
         ## Add enable/disable, scan, connect, disconnect, hostname, phy_mode, 
         if arg == "wlan": 
-            self.cls()
-            print(" wlan", wlan.active())
+            # self.cls()
+            print("=======================")
+            print(" wlan", _wlan.active())
             print("\n 1 - toggle wlan")
             print(" 2 - scan networks")
             print(" 3 - connect (config)")
             print(" 4 - disconnect")
             user_input = input("\n:: ")
-            if user_input in "1":
-                if wlan.active() == True:
-                    wlan.active(False)
+
+            if user_input == "1":
+                if _wlan.active() == True:
+                    _wlan.active(False)
                     print("Disabled wlan")
                 else:
-                    wlan.active(True)
+                    _wlan.active(True)
                     print("Enabled wlan")
             
-            if user_input in "2":
-                scan = wlan.scan()
-                ssid00 = scan[0][0].decode("utf-8")
-                print(scan)              
-                print(ssid00) ## just a test
-            
-        # if arg == "ap":
+            if user_input == "2":
+                if not _wlan.active():
+                    self.print_err("wlan must be on!")
+                else:
+                    scan = _wlan.scan()
+                    # print(scan)
+                    for network in scan:
+                        network_ssid = network[0].decode("utf-8")
+                        network_mac = ubinascii.hexlify(network[1]).decode().upper()
+                        network_channel = network[2]
 
+                        network_mode_num = network[4]
+                        if network_mode_num == 0:
+                            network_mode = "open"
+                        if network_mode_num == 1:
+                            network_mode = "WEP"
+                        if network_mode_num == 2:
+                            network_mode = "WPA-PSK"
+                        if network_mode_num == 3:
+                            network_mode = "WPA2-PSK"
+                        if network_mode_num == 4:
+                            network_mode = "WPA/WPA2-PSK"
+
+                        signal = str(network[3])+"dB"
+                        print(network_ssid,"\t", network_mac, network_channel, network_mode, signal)
+
+            if user_input == "3":
+                _ssid = input("\n Network SSID: ")
+                _passwd = input("\n Network password: ")
+                _wlan.connect(_ssid, _passwd)
+
+            if user_input == "4":
+                _wlan.disconnect()
+                print(" disconnected")
+                                    
+        # if arg == "_ap":
         # else:
         #     self.print_msg(" smolOS wifi utility\n help - prints this message\n status - current network status\n ")
 
