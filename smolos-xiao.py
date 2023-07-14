@@ -10,7 +10,7 @@ import _thread
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.7-xiao"
+        self.version = "0.7a-xiao"
         self.board = "Seeed XIAO RP2040"
         self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
         self.system_led = machine.Pin(25,machine.Pin.OUT)
@@ -126,7 +126,7 @@ class smolOS:
         print("\t\033[0mMicroPython:\033[1m",uos.uname().release)
         print("\t\033[0m"+self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
         print("\t\033[0mFirmware:\033[1m",uos.uname().version)
-        turbo_msg = "\033[0mIn \033[1mslow mode\033[0m, power-saving mode. Use `turbo` to boost speed."
+        turbo_msg = "\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
         if self.turbo:
             turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` again for slow mode."
         print("\t\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
@@ -222,7 +222,9 @@ class smolOS:
         print("Welcome to \033[7msmolEDitor\033[0m\nMinimum viable text editor for smol operating system")
         try:
             with open(filename,'r+') as file:
-                print("\nEditing existing \033[7m"+filename+"\033[0m file\n")
+                if filename in self.protected_files:
+                    self.print_err("Protected file. View only.")
+                self.print_msg("Loaded existing "+filename+" file.")
                 lines = file.readlines()
                 line_count = len(lines)
                 start_index = 0
@@ -232,7 +234,7 @@ class smolOS:
                         end_index = min(start_index + self.page_size,line_count)
                         print_lines = lines[start_index:end_index]
 
-                        print("\033[7m    File:",filename,"Page:",start_index % self.page_size,"Lines:",line_count," (`h` help, `b` back,`n` next page)\033[0m")
+                        print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
 
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
                             print("{}: {}".format(f"{line_num:03}",line.strip()))
@@ -243,9 +245,11 @@ class smolOS:
                         if self.file_edited:
                             self.print_msg("file was edited, `save` it first or write `quit!`")
                         else:
+                            self.print_msg("smolEDitor closed")
                             break
 
                     if user_ed_input == "quit!":
+                        self.print_msg("smolEDitor closed")
                         break
 
                     if user_ed_input == "help":
@@ -268,18 +272,24 @@ class smolOS:
                             self.print_msg("Can not go back, it is a first page already.")
 
                     if user_ed_input in ("save","write"):
-                        self.print_err("Saving not implemented yet")
+                        if filename in self.protected_files:
+                            self.print_err("Protected file")
+                        else:
+                            self.print_err("Saving not implemented yet")
 
                     parts = user_ed_input.split(" ",1)
                     if len(parts) == 2:
-                        line_number = int(parts[0])
-                        new_content = parts[1]
-                        self.file_edited = True
-
-                        if line_number > 0 and line_number < line_count:
-                            lines[line_number - 1] = new_content + "\n"
+                        if filename in self.protected_files:
+                            self.print_err("Protected file")
                         else:
-                            self.print_err("Invalid line number")
+                            line_number = int(parts[0])
+                            new_content = parts[1]
+                            self.file_edited = True
+
+                            if line_number > 0 and line_number < line_count:
+                                lines[line_number - 1] = new_content + "\n"
+                            else:
+                                self.print_err("Invalid line number")
 
 
         except OSError:
