@@ -6,19 +6,19 @@ import uos
 import gc
 import utime
 import _thread
-from ws2812 import WS2812
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.6-xiao"
+        self.version = "0.6b-xiao"
         self.board = "Seeed XIAO RP2040"
         self.turbo = False
-        self.cpu_speed_range = {"slow":40,"turbo":133} # Mhz
+        self.cpu_speed_range = {"slow":80,"turbo":133} # Mhz
         self.thread_running = False
         self.power = machine.Pin(11,machine.Pin.OUT)
         self.power.value(1)
         self.led_pixel = WS2812(12,1)
+        self.system_led = machine.Pin(25, machine.Pin.OUT)
         self.protected_files = { "boot.py", "main.py" }
         self.user_commands = {
             "banner": self.banner,
@@ -53,18 +53,19 @@ class smolOS:
 
         }
         self.ed_commands_manual = {
-            "h or help": "this help",
-            "n or next": "next page",
-            "b or back": "back one page",
-            "n <line of text>": "replacing n line with a line of text",
-            "a or append": "append new line at the end of a file",
-            "w or write": "write changes to a file (not implemented yet)",
-            "q or quit": "quit"
+            "help": "this help",
+            "n": "next page",
+            "b ": "back one page",
+            "10 <line of text>": "replacing 10-th line with a line of text",
+            "a": "append new line at the end of a file",
+            "write or save": "write changes to a file (not implemented yet)",
+            "quit": "quit"
         }
 
         self.boot()
 
     def boot(self):
+        machine.freq(self.cpu_speed_range["slow"] * 1000000)
         self.cls()
         self.welcome()
         self.led("boot")
@@ -178,39 +179,33 @@ class smolOS:
             return
         exec(open(filename).read())
 
-    def led(self,rgb_color=""):
-        if rgb_color=="":
-            self.print_msg("Rainbow!")
-            self.led_pixel.rainbow_cycle(0.001)
+    def led(self,turn="on"):
+        if turn in ("on",""):
+            self.system_led.value(0)
             return
-        if rgb_color=="boot":
+        if turn=="off":
+            self.system_led.value(1)
+            return
+        if turn=="boot":
             for _ in range(4):
-                self.led_pixel.pixels_fill((255,22,22))
-                self.led_pixel.pixels_show()
+                self.system_led.value(0)
                 utime.sleep(0.1)
-                self.led_pixel.pixels_fill((32,5,5))
-                self.led_pixel.pixels_show()
+                self.system_led.value(1)
                 utime.sleep(0.05)
-            self.led_pixel.pixels_fill((255,22,22))
-            self.led_pixel.pixels_show()
+            self.system_led.value(1)
             return
 
-        color = tuple(map(int, rgb_color.split(',')))
-        self.print_msg("LED set to: "+rgb_color)
-        self.led_pixel.pixels_fill(color)
-        self.led_pixel.pixels_show()
 
     def led_hearthbeat(self):
-        heartbeat_pattern = [0, 10, 20, 50, 100, 255, 200, 100, 50, 30, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # pattern for heartbeat
         while self.thread_running:
-            for brightness in heartbeat_pattern:
-                red = int((255 * brightness) / 255)
-                green = int((105 * brightness) / 255)
-                blue = int((180 * brightness) / 255)
+            for _ in range(2):
+                self.system_led.value(1)
+                utime.sleep(0.05*4)
+                self.system_led.value(0)
+                utime.sleep(0.05*4)
+            self.system_led.value(1)
+            utime.sleep(0.05*14)
 
-                self.led_pixel.pixels_fill((red, green, blue))
-                self.led_pixel.pixels_show()
-                utime.sleep(0.05)
 
     def bg(self):
         if self.thread_running:
@@ -229,6 +224,7 @@ class smolOS:
     # Minimum viable text editor
     def ed(self, filename=""):
         self.page_size = 10
+        self.file_edited = False
         print("Welcome to \033[7msmolEDitor\033[0m\nMinimum viable text editor for smol operating system")
         try:
             with open(filename,'r+') as file:
@@ -249,38 +245,39 @@ class smolOS:
 
                     user_ed_input = input("\ned $: ")
 
-                    if user_ed_input in ("q","quit"):
+                    if user_ed_input =="quit":
+                        if self.file_edited:
+                            self.print_msg("file was edited, `save` it first or write `quit!`")
+                    if user_ed_input == "quit!":
                         break
 
-                    if user_ed_input in ("wq"):
-                        self.print_err("No saving so no write-quit functon.")
-
-                    if user_ed_input in ("h","help"):
+                    if user_ed_input == "help":
                         self.man(self.ed_commands_manual)
 
-                    if user_ed_input in ("a","append"):
+                    if user_ed_input == "a":
                         line_count += 1
                         lines.append("")
 
-                    if user_ed_input in ("n","next"):
+                    if user_ed_input == "n":
                         if start_index+self.page_size < line_count:
                             start_index += self.page_size
                         else:
                             self.print_msg("There is no next page. This is the last page.")
 
-                    if user_ed_input in ("b","back"):
+                    if user_ed_input == "b":
                         if start_index-self.page_size >= 0:
                             start_index -= self.page_size
                         else:
                             self.print_msg("Can not go back, it is a first page already.")
 
-                    if user_ed_input in ("w","write"):
+                    if user_ed_input in ("save","write"):
                         self.print_err("Saving not implemented yet")
 
                     parts = user_ed_input.split(" ",1)
                     if len(parts) == 2:
                         line_number = int(parts[0])
                         new_content = parts[1]
+                        self.file_edited = True
 
                         if line_number > 0 and line_number < line_count:
                             lines[line_number - 1] = new_content + "\n"
@@ -295,4 +292,5 @@ class smolOS:
                 self.print_err("Failed to open the file.")
 
 smol = smolOS()
+
 
