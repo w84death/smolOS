@@ -10,7 +10,7 @@ import _thread
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.7a-xiao"
+        self.version = "0.7b-xiao"
         self.board = "Seeed XIAO RP2040"
         self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
         self.system_led = machine.Pin(25,machine.Pin.OUT)
@@ -107,7 +107,7 @@ class smolOS:
         utime.sleep(1)
 
     def print_msg(self, message):
-        print("\n\033[1;30;43m\t->",message,"\t\033[0m")
+        print("\n\033[1;34;47m\t->",message,"\t\033[0m")
         utime.sleep(0.5)
 
     def unknown_function(self):
