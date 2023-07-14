@@ -1,20 +1,23 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
-# Source version: 0.4c-xiao modified at 2023.07.13
-
 
 import machine
 import uos
 import gc
 import utime
+import _thread
 from ws2812 import WS2812
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.4d-xiao"
+        self.version = "0.5c-xiao"
         self.turbo = False
-        self.files = uos.listdir()
+        self.cpu_speed_range = {"slow":40,"turbo":133} # Mhz
+        self.thread_running = False
+        self.power = machine.Pin(11,machine.Pin.OUT)
+        self.power.value(1)
+        self.led_pixel = WS2812(12,1)
         self.protected_files = { "boot.py", "main.py" }
         self.user_commands = {
             "banner": self.banner,
@@ -24,24 +27,21 @@ class smolOS:
             "rm": self.rm,
             "cls": self.cls,
             "stats": self.stats,
-            "mhz": self.set_cpu_mhz,
             "turbo": self.toggle_turbo,
             "ed": self.ed,
             "info": self.info,
             "py": self.py,
-            "led": self.led
+            "led": self.led,
+            "bg": self.bg,
+            "kill": self.kill
         }
 
         self.boot()
 
     def boot(self):
-        self.set_cpu_mhz(133)
-        self.power = machine.Pin(11,machine.Pin.OUT)
-        self.power.value(1)
-        self.led_pixel = WS2812(12,1)
-        self.led("boot")
         self.cls()
         self.welcome()
+        self.led("boot")
         while True:
             user_input = input("\nsmol $: ")
             parts = user_input.split()
@@ -57,52 +57,60 @@ class smolOS:
                     self.unknown_function()
 
     def banner(self):
-        print("______________________________________________")
+        print("\033[1;33;44m")
         print("                                 ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
         print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
         print("==============XIAO-RP2040-EDiTiON=============")
+        print("\033[0m")
 
     def welcome(self):
-        print("\n\n\n\n")
         self.banner()
-        print("\n")
         self.stats()
-        print("\n\n\n\n")
         self.print_msg("Type 'help' for a smol manual.")
-        print("\n")
 
     def help(self):
-        print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information")
-        print("\nSystem created by Krzysztof Krystian Jankowski")
-        print("Code available at github and smol.p1x.in/os/")
+        commands = {
+            "ls": "list files",
+            "cat <filename>": "print filename content",
+            "info <filename>": "information about a file",
+            "rm <filename>": "remove a file (be careful!)",
+            "ed <filename>": "text editor, filename is optional",
+            "cls": "clears the screen",
+            "banner": "prints system banner",
+            "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
+            "stats": "system statistics",
+            "py <filename>": "runs user program",
+            "led": "manipulating on-board LED",
+            "bg": "experimental multitasking",
+            "kill": "killing background task"
+
+        }
+        print(self.name+ " version "+self.version+" user commands:\n")
+        for cmd,desc in commands.items():
+            print("\t\033[7m"+cmd+"\033[0m -",desc)
+
+        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski.")
+        print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
 
     def print_err(self, error):
-        print("\n\t<!>",error,"<!>")
+        print("\n\033[1;37;41m\t<!>",error,"<!>\033[0m")
 
     def print_msg(self, message):
-        print("\n\t->",message)
+        print("\n\033[1;30;43m\t->",message,"\033[0m")
 
     def unknown_function(self):
         self.print_err("unknown function. Try 'help'.")
 
-    def set_cpu_mhz(self,freq="80"):
-        freq = int(freq)
-        if freq >= 80 and freq <= 160:
-            machine.freq(freq * 1000000)
-            self.print_msg("CPU frequency set to "+str(freq))
-        else:
-            self.print_err("wrong CPU frequency. Use between 80 and 160 MHz.")
-
     def toggle_turbo(self):
+        freq = self.cpu_speed_range["turbo"]
         if self.turbo:
-            self.set_cpu_mhz("80")
-        else:
-            self.set_cpu_mhz("160")
+             freq = self.cpu_speed_range["slow"]
+        machine.freq(freq * 1000000)
         self.turbo = not self.turbo
+        self.print_msg("CPU speed set to "+str(freq)+" Mhz")
 
     def stats(self):
         print("Board:",machine.unique_id())
@@ -178,6 +186,31 @@ class smolOS:
         self.print_msg("LED set to: "+rgb_color)
         self.led_pixel.pixels_fill(color)
         self.led_pixel.pixels_show()
+
+    def led_hearthbeat(self):
+        heartbeat_pattern = [0, 10, 20, 50, 100, 255, 200, 100, 50, 30, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # pattern for heartbeat
+        while self.thread_running:
+            for brightness in heartbeat_pattern:
+                red = int((255 * brightness) / 255)
+                green = int((105 * brightness) / 255)
+                blue = int((180 * brightness) / 255)
+
+                self.led_pixel.pixels_fill((red, green, blue))
+                self.led_pixel.pixels_show()
+                utime.sleep(0.05)
+
+    def bg(self):
+        if self.thread_running:
+            self.print_err("Already running in the background! Use `kill` command.")
+            return
+
+        self.thread_running = True
+        self.thread = _thread.start_new_thread(self.led_hearthbeat,())
+        self.print_msg("LED Hearthbeat running in the background...")
+
+    def kill(self):
+        self.thread_running = False
+        self.print_msg("LED Hearthbeat killed.")
 
     # smolEDitor
     # Minimum viable text editor
@@ -255,6 +288,4 @@ class smolOS:
                 self.print_err("Failed to open the file.")
 
 smol = smolOS()
-
-
 
