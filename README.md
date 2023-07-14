@@ -106,3 +106,4 @@ Write `help` for manual :)
 ## Articles
 - [hackster.io](https://www.hackster.io/news/krzysztof-jankowski-s-micropython-based-smolos-puts-a-tiny-posix-like-environment-on-your-esp8266-0c776559152b)
 - [cnx-software.com](https://www.cnx-software.com/2023/07/12/smolos-brings-a-linux-like-command-line-interface-to-esp8266-microcontroller/)
+- [lobste.rs](https://lobste.rs/s/ipztxc/smolos_small_os_for_micropython_on)
