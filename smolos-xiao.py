@@ -10,16 +10,14 @@ import _thread
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.6b-xiao"
+        self.version = "0.7-xiao"
         self.board = "Seeed XIAO RP2040"
+        self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
+        self.system_led = machine.Pin(25,machine.Pin.OUT)
+
         self.turbo = False
-        self.cpu_speed_range = {"slow":80,"turbo":133} # Mhz
         self.thread_running = False
-        self.power = machine.Pin(11,machine.Pin.OUT)
-        self.power.value(1)
-        self.led_pixel = WS2812(12,1)
-        self.system_led = machine.Pin(25, machine.Pin.OUT)
-        self.protected_files = { "boot.py", "main.py" }
+        self.protected_files = { "boot.py","main.py","ssd1306.py","ws2812.py" }
         self.user_commands = {
             "banner": self.banner,
             "help": self.help,
@@ -33,8 +31,7 @@ class smolOS:
             "info": self.info,
             "py": self.py,
             "led": self.led,
-            "bg": self.bg,
-            "kill": self.kill
+            "exe": self.exe
         }
         self.user_commands_manual = {
             "ls": "list files",
@@ -47,10 +44,8 @@ class smolOS:
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
             "py <filename>": "runs user program",
-            "led": "manipulating on-board LED",
-            "bg": "experimental multitasking",
-            "kill": "killing background task"
-
+            "led <command>": "manipulating on-board LED. Commands: `on`, `off`, `beat`, `stop`.",
+            "exe <code>": "Running exec(code)."
         }
         self.ed_commands_manual = {
             "help": "this help",
@@ -70,7 +65,7 @@ class smolOS:
         self.welcome()
         self.led("boot")
         while True:
-            user_input = input("\nsmol $: ")
+            user_input = input("\nsmol $:")
             parts = user_input.split()
             if len(parts) > 0:
                 command = parts[0]
@@ -127,23 +122,23 @@ class smolOS:
         self.print_msg("CPU speed set to "+str(freq)+" Mhz")
 
     def stats(self):
-        print("\033[0mBoard:\033[1m",self.board)
-        print("\033[0mMicroPython:\033[1m",uos.uname().release)
-        print("\033[0m"+self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
-        print("\033[0mFirmware:\033[1m",uos.uname().version)
-        print("\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz")
-        print("\033[0mFree memory:\033[1m",gc.mem_free(),"bytes")
-        print("\033[0mFree space:\033[1m",uos.statvfs("/")[0] * uos.statvfs("/")[2],"bytes")
+        print("\t\033[0mBoard:\033[1m",self.board)
+        print("\t\033[0mMicroPython:\033[1m",uos.uname().release)
+        print("\t\033[0m"+self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
+        print("\t\033[0mFirmware:\033[1m",uos.uname().version)
+        turbo_msg = "\033[0mIn \033[1mslow mode\033[0m, power-saving mode. Use `turbo` to boost speed."
+        if self.turbo:
+            turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` again for slow mode."
+        print("\t\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
+        print("\t\033[0mFree memory:\033[1m",gc.mem_free(),"bytes")
+        print("\t\033[0mFree space:\033[1m",uos.statvfs("/")[0] * uos.statvfs("/")[2],"bytes")
 
     def cls(self):
          print("\033[2J")
 
     def ls(self):
         for file in uos.listdir():
-            file_size = uos.stat(file)[6]
-            additional = ""
-            if file in self.protected_files: info = "protected system file"
-            print(file,"\t", file_size, "bytes", "\t"+additional)
+            self.info(file)
 
     def info(self,filename=""):
         if filename == "":
@@ -152,7 +147,7 @@ class smolOS:
         additional = ""
         file_size = uos.stat(filename)[6]
         if filename in self.protected_files: additional = "protected system file"
-        print(filename,"\t",file_size,"bytes","\t"+additional)
+        print("\t\033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
 
 
     def cat(self,filename=""):
@@ -179,14 +174,17 @@ class smolOS:
             return
         exec(open(filename).read())
 
-    def led(self,turn="on"):
-        if turn in ("on",""):
+    def exe(self,command):
+        exec(command)
+
+    def led(self,cmd="on"):
+        if cmd in ("on",""):
             self.system_led.value(0)
             return
-        if turn=="off":
+        if cmd=="off":
             self.system_led.value(1)
             return
-        if turn=="boot":
+        if cmd=="boot":
             for _ in range(4):
                 self.system_led.value(0)
                 utime.sleep(0.1)
@@ -194,9 +192,19 @@ class smolOS:
                 utime.sleep(0.05)
             self.system_led.value(1)
             return
+        if cmd=="beat":
+            if self.thread_running:
+                self.print_err("Already running in the background! Use `led stop` command.")
+                return
 
+            self.thread_running = True
+            self.thread = _thread.start_new_thread(self.led_hearthbeat_thread,())
+            self.print_msg("LED Hearthbeat running in the background. Use `led stop`command.")
+        if cmd=="stop":
+            self.thread_running = False
+            self.print_msg("LED Hearthbeat stopped.")
 
-    def led_hearthbeat(self):
+    def led_hearthbeat_thread(self):
         while self.thread_running:
             for _ in range(2):
                 self.system_led.value(1)
@@ -205,20 +213,6 @@ class smolOS:
                 utime.sleep(0.05*4)
             self.system_led.value(1)
             utime.sleep(0.05*14)
-
-
-    def bg(self):
-        if self.thread_running:
-            self.print_err("Already running in the background! Use `kill` command.")
-            return
-
-        self.thread_running = True
-        self.thread = _thread.start_new_thread(self.led_hearthbeat,())
-        self.print_msg("LED Hearthbeat running in the background...")
-
-    def kill(self):
-        self.thread_running = False
-        self.print_msg("LED Hearthbeat killed.")
 
     # smolEDitor
     # Minimum viable text editor
@@ -248,6 +242,9 @@ class smolOS:
                     if user_ed_input =="quit":
                         if self.file_edited:
                             self.print_msg("file was edited, `save` it first or write `quit!`")
+                        else:
+                            break
+
                     if user_ed_input == "quit!":
                         break
 
@@ -292,5 +289,3 @@ class smolOS:
                 self.print_err("Failed to open the file.")
 
 smol = smolOS()
-
-
