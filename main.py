@@ -46,7 +46,7 @@ class smolOS:
                     else:
                         self.user_commands[command]()
                 else:
-                    self.unknown_function()
+                    self.try_exec_script(command)
 
     def banner(self):
         print("______________________________________________")
@@ -68,7 +68,7 @@ class smolOS:
 
     def help(self):
         print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information")
+        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information\n\tYou can also run any Python script by typing its filename without `.py`")
         print("\nSystem created by Krzysztof Krystian Jankowski")
         print("Code available at github and smol.p1x.in/os/")
 
@@ -80,6 +80,13 @@ class smolOS:
 
     def unknown_function(self):
         self.print_err("unknown function. Try 'help'.")
+
+    def try_exec_script(self,command):
+        if command+'.py' in uos.listdir():
+            command = "import " + command
+            exec(command)
+        else:
+            self.unknown_function()
 
     def set_cpu_mhz(self,freq="80"):
         freq = int(freq)
