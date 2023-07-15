@@ -139,21 +139,21 @@ class neo_grid():
         return
     
     def plasma(self):
-        t=0
-        z=0.33
+        time=0
+        zoom=0.33
         pow=0.1
         while self.thread_running:
             for p in range(25):
                 x=p%5-2
                 y=p/5-2
-                c=math.sin(math.sin(x*z+math.cos(t*.3)*13) + math.cos(y*z+math.sin(t*.2)*17))
+                c=math.sin(math.sin(x*zoom+math.cos(time*.3)*13) + math.cos(y*zoom+math.sin(time*.2)*17))
                 c=(128+int(c*128))*pow
                 if self.hearth_bitmap[24-p]==0:
-                    c=c*0.025  
+                    c=c*0.025
                 self.pixels[p]=(
-                    int(c+5+math.sin(t*0.21)*5),
-                    int(c+5+math.sin(1+t*0.33)*5),
-                    int(c+5+math.sin(1+t*0.47)*5))
+                    int(c+5+math.sin(time*0.21)*5),
+                    int(c+5+math.cos                                                                                                (1+time*0.33)*5),
+                    int(c+5+math.sin(1+time*0.47)*5))
             self.pixels.write()
             t+=0.05
 
