@@ -5,60 +5,40 @@ smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266 
 
 ![smolOS in color version 0.7](media/smolos-color.png)
 
-Latest documentattion available at official homepage:
+Latest documentation available at official homepage:
 - [smolOS homepage (http)](http://smol.p1x.in/os/)
 - [smolOS homepage (https)](https://smol.p1x.in/os/)
 
+## Real Life Usecases
+
+* listing and removing unwanted files on board
+* checking free space
+* quicly iterating parameters for a program
+* (planned) easy expanding OS with own functions coding on the board
+* learning basics of operating disk operating system (using and modyfing)
 
 ## smolOS Features
 
-* Changes ESP8266 into a small working PC
+* Changes microcontroller into a small working PC
 * Homemade for fun and learning
 * Super small and fast
 * Easy to use, simillar to MS-DOS, POSIX-like environment
 * List and manipulates files
-* Text editor included (basic)
-* Ability to view and edit the OS code in runtime
+* Text editor included (very basic)
+* Ability to expand OS functionality with user defined code
 * Build on MicroPython
+* Stability and simplicity are the main principle behind the code
+* Free :)
 
-## Install
-### Requiments
-```
-$ python3 -m venv venv
-$ source venv/bin/activate
-$ pip install esp-tool adafruit-ampy
-```
+## Installation
 
-### Flashing MicroPython on ESP8266
-Remember to ground PIN 0 for flash mode. I've added a push button to the UART-to-USB dongle for that. I then push it while plugging in.
+### Super Quick Quide
+Just put ```main.py``` into the board (that has latest MicroPython firmware) and restart.
 
-Get the latest firmware from [MicroPython Download Page for ESP8266 1MB](https://micropython.org/download/esp8266-1m/). That's the chip I got.
+### Detailed Guides
+* [ESP8266 Guide](ESP8266.md)
+* [XIAO RP2040 Guide](XIAO-RP2040.md)
 
-In the time of writeing this was the latest file: esp8266-1m-20230426-v1.20.0.bin.
-
-As super user.
-
-```
-$ su
-$ esptool.py chip_id
-$ esptool.py --port /dev/ttyUSB0 erase_flash
-$ esptool.py --port /dev/ttyUSB0 --baud 115200 write_flash --flash_size=detect -fm dout 0 esp8266-1m-20230426-v1.20.0.bin
-```
-
-- chip_id lists specs and confirms that everything works
-- erase_flash clears everything
-- write_flash flashes the MicroPython firmware
-
-### pushing OSs
-**Rename downloaded sources to main.py**
-```
-$ ampy --port /dev/ttyUSB0 put main.py
-$ ampy --port /dev/ttyUSB0 put hello.txt
-```
-- main.py is the smolOS, this file name will run at boot
-- hello.txt is just a test file so you have something to play with
-- put your own files the same way
-- **do not** ovevrite the system boot.py file!
 
 ## Connecting
 As normal user:
@@ -109,9 +89,14 @@ smol $:
 
 ![import and run](media/reset.png)
 
-In MicroPython REPL write:
+If you close the system or encurage a fatal error start OS again. In MicroPython REPL write:
 ```
 >>> smolOS()
+```
+
+Or restart device:
+```
+>>> machine.soft_reset()
 ```
 
 ## Using
