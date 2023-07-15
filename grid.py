@@ -53,6 +53,7 @@ class neo_grid():
             6,5,0,6,5,
         ]
         
+        # smolOS
         self.logo_bitmap=[
             8,8,8,8,9,
             8,8,9,8,9,
@@ -84,7 +85,7 @@ class neo_grid():
         ]
 
 
-        print("NeoPixel Grid: Initialized.\bUse grid.start(), grid.stop(), grid.rainbow(), grid.color(\"r,g,b\"), grid.hearth().")
+        print("NeoPixel Grid: Initialized.\bUse grid.demo(), grid.stop(), grid.color(\"r,g,b\"), grid.hearth().")
 
     def draw(self,bitmap,offset=0,len=25,bg=(0,0,0)):
         for i in range(25):
@@ -100,7 +101,7 @@ class neo_grid():
         screen_len=25
         offset=-50
         fast=0.05
-        slow=0.12
+        swlow=0.12
         len=(25*5)+1
         bitmap=self.logo_bitmap
         bitmap_id=0
@@ -156,9 +157,8 @@ class neo_grid():
             self.pixels.write()
             t+=0.05
 
-
-    def rainbow_thread(self):
-        return
+    def demo(self):
+        self.start(self.plasma)
 
     def stop(self):
         self.thread_running = False
@@ -168,9 +168,9 @@ class neo_grid():
         if not self.thread_running:
             self.thread_running = True
             _thread.start_new_thread(fn,())
-            print("NeoPixel: Marquee thread started in background. Use grid.stop()")
+            print("NeoPixel: Demo thread started in background. Use grid.stop()")
         else:
             print("NeoPixel: Thread already used. Use grid.stop()")
 
 grid = neo_grid()
-grid.start(grid.plasma)
+grid.demo()
