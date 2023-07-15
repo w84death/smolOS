@@ -9,28 +9,101 @@ class neo_grid():
         self.thread_running = False
         
         self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
-        self.pixels.fill(0)
+        self.pixels.fill((0,0,0))
         self.pixels.write()
-        self.palette = [(12,0,0),(255,128,32)]
-        self.heart_bitmap = [
-            0,1,1,0,0,
-            1,1,1,1,0,
-            0,1,1,1,1,
-            1,1,1,1,0,
-            0,1,1,0,0,
+        self.brightness = 0.2
+        self.palette = [
+            (0,0,0),
+            (0,0,20),
+            (25,7,21),
+            (234,0,25),
+            (19,0,20)]
+        
+        self.hearth_bitmap = [
+            0,4,4,0,0,
+            3,3,3,4,0,
+            0,2,3,3,4,
+            2,2,3,3,0,
+            0,2,2,0,0,
         ]
+
+        self.empty_bitmap = [
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+        ]
+        self.p1x_bitmap = [
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            1,1,1,1,1,
+            1,0,1,0,0,
+            1,1,1,0,0,
+            0,0,0,0,0,
+            1,1,1,1,1,
+            0,0,0,0,0,
+            1,1,0,1,1,
+            0,0,1,0,0,
+            1,1,0,1,1,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,
+            0,0,0,0,0,            
+            0,0,0,0,0,
+        ]
+
 
         print("NeoPixel Grid: Initialized.\bUse grid.start(), grid.stop(), grid.rainbow(), grid.color(\"r,g,b\"), grid.hearth().")
 
-    def draw(self,bitmap):
+    def draw(self,bitmap,offset=0):
         i=0
-        for pixel in bitmap:
-            self.pixels[i]=self.palette[pixel]
+        for i in range(25):
+            if i<25:
+                self.pixels[24-i]=self.palette[bitmap[i+offset]]
             i=i+1
+            
         self.pixels.write()
 
+    def test(self):
+        while self.thread_running:
+            self.pixels.fill(self.palette[0])
+            self.pixels.write()
+            utime.sleep(1)
+            
+            self.draw(self.hearth_bitmap)
+            utime.sleep(2)
+            
+            self.draw(self.p1x_bitmap)
+            utime.sleep(2)
+            
+            self.pixels.fill((255,0,0))
+            self.pixels.write()
+            utime.sleep(0.1)
+            self.pixels.fill((0,255,0))
+            self.pixels.write()
+            utime.sleep(0.1)
+            self.pixels.fill((0,0,255))
+            self.pixels.write()
+            utime.sleep(0.1)
+             
+    def marquee(self):
+        offset=0
+        speed=0.1
+        while self.thread_running:
+            self.draw(self.p1x_bitmap,offset)
+            utime.sleep(speed)
+            offset += 5
+            if offset > 14*5:
+                offset=0
+    
     def hearth(self):
-        self.draw(self.heart_bitmap)
+        self.draw(self.hearth_bitmap)
 
     def color(self,rgb_color=""):
         return
@@ -48,7 +121,7 @@ class neo_grid():
     def start(self):
         if not self.thread_running:
             self.thread_running = True
-            _thread.start_new_thread(self.hearthbeat,())
+            _thread.start_new_thread(self.marquee,())
             print("NeoPixel: Hearthbeat started in background. Use np.stop()")
         else:
             print("NeoPixel: Thread already used. Use np.stop()")
@@ -66,5 +139,5 @@ class neo_grid():
                 utime.sleep(0.05)
 
 grid = neo_grid()
-
+grid.start()
 
