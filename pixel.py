@@ -1,4 +1,4 @@
-from ws2812 import WS2812
+import neopixel
 import utime
 import _thread
 
@@ -7,19 +7,15 @@ class neo_pixel():
         self.thread_running = False
         self.power = machine.Pin(11,machine.Pin.OUT)
         self.power.value(1)
-        self.led_pixel = WS2812(12,1)
-        print("NeoPixel: Initialized.\bUse pixel.start(), pixel.stop(), pixel.rainbow(), pixel.color(\"r,g,b\").")
+        self.grid = neopixel.NeoPixel(machine.Pin(12),1)
+        print("NeoPixel: Initialized.\bUse pixel.start(), pixel.stop(), pixel.color(\"r,g,b\").")
 
     def color(self,rgb_color=""):
+        if rgb_color="":
+            rgb_color=(0,0,0)
         color = tuple(map(int, rgb_color.split(',')))
-        self.led_pixel.pixels_fill(color)
-        self.led_pixel.pixels_show()
-    def rainbow(self):
-        self.thread_running = True
-        _thread.start_new_thread(self.rainbow_thread,())
-
-    def rainbow_thread(self):
-        self.led_pixel.rainbow_cycle(0.001)
+        self.grid.fill(color)
+        self.grid.write()
 
     def stop(self):
         self.thread_running = False
@@ -41,8 +37,8 @@ class neo_pixel():
                 green = int((105 * brightness) / 255)
                 blue = int((180 * brightness) / 255)
 
-                self.led_pixel.pixels_fill((red, green, blue))
-                self.led_pixel.pixels_show()
+                self.grid.pixels_fill((red, green, blue))
+                self.grid.pixels_show()
                 utime.sleep(0.05)
 
 pixel = neo_pixel()
