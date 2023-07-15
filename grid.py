@@ -1,3 +1,4 @@
+# App for controlling Adafruit NeoPixel BFF 5x5 LED Grid
 import utime
 import _thread
 import time
@@ -7,12 +8,10 @@ class neo_grid():
     def __init__(self):
         self.thread_running = False
         
-        self.pixels = neopixel.NeoPixel(machine.Pin(29), 5*5)
+        self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill(0)
-        self.pixels.show()
-        self.colors = [0, 0]
-        self.hue = 0
-
+        self.pixels.write()
+        self.palette = [(12,0,0),(255,128,32)]
         self.heart_bitmap = [
             0,1,1,0,0,
             1,1,1,1,0,
@@ -21,8 +20,17 @@ class neo_grid():
             0,1,1,0,0,
         ]
 
+        print("NeoPixel Grid: Initialized.\bUse grid.start(), grid.stop(), grid.rainbow(), grid.color(\"r,g,b\"), grid.hearth().")
 
-        print("NeoPixel Grid: Initialized.\bUse np.start(), np.stop(), np.rainbow(), np.color(\"r,g,b\").")
+    def draw(self,bitmap):
+        i=0
+        for pixel in bitmap:
+            self.pixels[i]=self.palette[pixel]
+            i=i+1
+        self.pixels.write()
+
+    def hearth(self):
+        self.draw(self.heart_bitmap)
 
     def color(self,rgb_color=""):
         return
