@@ -14,18 +14,15 @@ class neo_grid():
         self.brightness = 0.2
         self.palette = [
             (0,0,0),
+            (10,10,10),
+            (10,5,5),
+            (10,2,2),
+            (5,0,5),
             (0,0,20),
-            (25,7,21),
-            (234,0,25),
-            (19,0,20)]
-        
-        self.hearth_bitmap = [
-            0,4,4,0,0,
-            3,3,3,4,0,
-            0,2,3,3,4,
-            2,2,3,3,0,
-            0,2,2,0,0,
-        ]
+            (1,0,20),
+            (0,0,5),
+            (0,0,5),
+            (20,20,10)]
 
         self.empty_bitmap = [
             0,0,0,0,0,
@@ -34,74 +31,105 @@ class neo_grid():
             0,0,0,0,0,
             0,0,0,0,0,
         ]
+        
+        self.hearth_bitmap = [
+            0,2,2,0,0,
+            2,1,3,3,0,
+            0,2,3,3,4,
+            3,3,3,4,0,
+            0,4,4,0,0,
+        ]
+
         self.p1x_bitmap = [
+            6,6,5,5,6,
+            6,0,5,0,0,
+            5,5,5,0,0,
+            0,7,0,0,0,
+            6,6,6,6,5,
             0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            1,1,1,1,1,
-            1,0,1,0,0,
-            1,1,1,0,0,
-            0,0,0,0,0,
-            1,1,1,1,1,
-            0,0,0,0,0,
-            1,1,0,1,1,
-            0,0,1,0,0,
-            1,1,0,1,1,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,
-            0,0,0,0,0,            
-            0,0,0,0,0,
+            6,5,0,6,5,
+            0,0,7,0,0,
+            6,5,0,6,5,
+        ]
+        
+        self.logo_bitmap=[
+            8,8,8,8,9,
+            8,8,9,8,9,
+            8,9,8,9,8,
+            8,9,8,8,8,
+            8,8,8,8,8,
+            8,8,8,9,9,
+            8,8,9,9,8,
+            8,8,9,9,9,
+            8,8,9,9,8,
+            8,8,8,8,8,
+            8,8,8,9,9,
+            8,8,9,8,9,
+            8,8,9,9,8,
+            8,8,8,8,8,
+            8,8,8,9,9,
+            8,9,9,8,8,
+            8,8,8,8,8,
+            8,8,9,9,8,
+            8,9,8,8,9,
+            9,8,8,8,9,
+            9,8,8,9,8,
+            8,9,9,8,8,            
+            8,8,8,8,9,
+            8,9,9,8,9,
+            9,8,8,9,8,
+            9,8,8,8,8,
+            8,8,8,8,8,
         ]
 
 
         print("NeoPixel Grid: Initialized.\bUse grid.start(), grid.stop(), grid.rainbow(), grid.color(\"r,g,b\"), grid.hearth().")
 
-    def draw(self,bitmap,offset=0):
-        i=0
+    def draw(self,bitmap,offset=0,len=25,bg=(0,0,0)):
         for i in range(25):
             if i<25:
-                self.pixels[24-i]=self.palette[bitmap[i+offset]]
-            i=i+1
-            
+                if i+offset<0 or i+offset>len-1:
+                    self.pixels[24-i]=bg
+                else:
+                    self.pixels[24-i]=self.palette[bitmap[i+offset]]
+            i=i+1 
         self.pixels.write()
 
-    def test(self):
-        while self.thread_running:
-            self.pixels.fill(self.palette[0])
-            self.pixels.write()
-            utime.sleep(1)
-            
-            self.draw(self.hearth_bitmap)
-            utime.sleep(2)
-            
-            self.draw(self.p1x_bitmap)
-            utime.sleep(2)
-            
-            self.pixels.fill((255,0,0))
-            self.pixels.write()
-            utime.sleep(0.1)
-            self.pixels.fill((0,255,0))
-            self.pixels.write()
-            utime.sleep(0.1)
-            self.pixels.fill((0,0,255))
-            self.pixels.write()
-            utime.sleep(0.1)
-             
     def marquee(self):
-        offset=0
-        speed=0.1
+        screen_len=25
+        offset=-50
+        fast=0.05
+        slow=0.12
+        len=(25*5)+1
+        bitmap=self.logo_bitmap
+        bitmap_id=0
+        bg=8
         while self.thread_running:
-            self.draw(self.p1x_bitmap,offset)
-            utime.sleep(speed)
+            self.draw(bitmap,offset,len,self.palette[bg])
+            if offset==0 or (len>screen_len and offset<len-10 and offset>0):
+                utime.sleep(slow)
+                if len==screen_len:
+                    utime.sleep(slow*10)
+            else:   
+                utime.sleep(fast)
             offset += 5
-            if offset > 14*5:
-                offset=0
-    
+            if offset >= len:
+                offset=-50
+                bitmap_id+=1
+                if bitmap_id>3: bitmap_id=0
+                if bitmap_id==0:
+                    bitmap=self.logo_bitmap
+                    len=(25*5)+5
+                    bg=8
+                if bitmap_id==2:
+                    bitmap=self.p1x_bitmap
+                    bg=0
+                    len=9*5                
+                if bitmap_id in (1,3):
+                    bitmap=self.hearth_bitmap
+                    len=25
+                    bg=4
+
     def hearth(self):
         self.draw(self.hearth_bitmap)
 
@@ -116,27 +144,15 @@ class neo_grid():
 
     def stop(self):
         self.thread_running = False
-        print("NeoPixel: Hearthbeat stopped. Use np.start()")
+        print("NeoPixel: Thread stopped. Use grid.start()")
 
     def start(self):
         if not self.thread_running:
             self.thread_running = True
             _thread.start_new_thread(self.marquee,())
-            print("NeoPixel: Hearthbeat started in background. Use np.stop()")
+            print("NeoPixel: Marquee thread started in background. Use grid.stop()")
         else:
-            print("NeoPixel: Thread already used. Use np.stop()")
-
-    def hearthbeat(self):
-        heartbeat_pattern = [0, 10, 20, 50, 100, 255, 200, 100, 50, 30, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # pattern for heartbeat
-        while self.thread_running:
-            for brightness in heartbeat_pattern:
-                red = int((255 * brightness) / 255)
-                green = int((105 * brightness) / 255)
-                blue = int((180 * brightness) / 255)
-
-                self.led_pixel.pixels_fill((red, green, blue))
-                self.led_pixel.pixels_show()
-                utime.sleep(0.05)
+            print("NeoPixel: Thread already used. Use grid.stop()")
 
 grid = neo_grid()
 grid.start()

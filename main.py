@@ -15,7 +15,7 @@ class smolOS:
         self.system_led = machine.Pin(25,machine.Pin.OUT)
 
         self.prompt = "\nsmol $: "
-        self.turbo = True
+        self.turbo = False
         self.thread_running = False
         self.protected_files = { "boot.py","main.py","ws2812.py" }
         self.user_commands = {
@@ -62,6 +62,7 @@ class smolOS:
         self.cls()
         self.welcome()
         self.led("boot")
+        self.py("grid")
         while True:
             user_input = input(self.prompt)
             parts = user_input.split()
