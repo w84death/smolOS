@@ -1,48 +1,51 @@
-from ws2812 import WS2812
-import utime
-import _thread
+ 
+# NeoPixel driver for MicroPython
+# MIT license; Copyright (c) 2016 Damien P. George, 2021 Jim Mussared
 
-class neo_pixel():
-    def __init__(self):
-        self.thread_running = False
-        self.power = machine.Pin(11,machine.Pin.OUT)
-        self.power.value(1)
-        self.led_pixel = WS2812(12,1)
-        print("NeoPixel: Initialized.\bUse np.start(), np.stop(), np.rainbow(), np.color(\"r,g,b\").")
+from machine import bitstream
 
-    def color(self,rgb_color=""):
-        color = tuple(map(int, rgb_color.split(',')))
-        self.led_pixel.pixels_fill(color)
-        self.led_pixel.pixels_show()
-    def rainbow(self):
-        self.thread_running = True
-        _thread.start_new_thread(self.rainbow_thread,())
 
-    def rainbow_thread(self):
-        self.led_pixel.rainbow_cycle(0.001)
+class NeoPixel:
+    # G R B W
+    ORDER = (1, 0, 2, 3)
 
-    def stop(self):
-        self.thread_running = False
-        print("NeoPixel: Hearthbeat stopped. Use np.start()")
+    def __init__(self, pin, n, bpp=3, timing=1):
+        self.pin = pin
+        self.n = n
+        self.bpp = bpp
+        self.buf = bytearray(n * bpp)
+        self.pin.init(pin.OUT)
+        # Timing arg can either be 1 for 800kHz or 0 for 400kHz,
+        # or a user-specified timing ns tuple (high_0, low_0, high_1, low_1).
+        self.timing = (
+            ((400, 850, 800, 450) if timing else (800, 1700, 1600, 900))
+            if isinstance(timing, int)
+            else timing
+        )
 
-    def start(self):
-        if not self.thread_running:
-            self.thread_running = True
-            _thread.start_new_thread(self.hearthbeat,())
-            print("NeoPixel: Hearthbeat started in background. Use np.stop()")
-        else:
-            print("NeoPixel: Thread already used. Use np.stop()")
+    def __len__(self):
+        return self.n
 
-    def hearthbeat(self):
-        heartbeat_pattern = [0, 10, 20, 50, 100, 255, 200, 100, 50, 30, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]  # pattern for heartbeat
-        while self.thread_running:
-            for brightness in heartbeat_pattern:
-                red = int((255 * brightness) / 255)
-                green = int((105 * brightness) / 255)
-                blue = int((180 * brightness) / 255)
+    def __setitem__(self, i, v):
+        offset = i * self.bpp
+        for i in range(self.bpp):
+            self.buf[offset + self.ORDER[i]] = v[i]
 
-                self.led_pixel.pixels_fill((red, green, blue))
-                self.led_pixel.pixels_show()
-                utime.sleep(0.05)
+    def __getitem__(self, i):
+        offset = i * self.bpp
+        return tuple(self.buf[offset + self.ORDER[i]] for i in range(self.bpp))
 
-np = neo_pixel()
+    def fill(self, v):
+        b = self.buf
+        l = len(self.buf)
+        bpp = self.bpp
+        for i in range(bpp):
+            c = v[i]
+            j = self.ORDER[i]
+            while j < l:
+                b[j] = c
+                j += bpp
+
+    def write(self):
+        # BITSTREAM_TYPE_HIGH_LOW = 0
+        bitstream(self.pin, 0, self.timing, self.buf)

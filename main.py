@@ -1,41 +1,69 @@
 # smolOS by Krzysztof Krystian Jankowski
 # Homepage: http://smol.p1x.in/os/
-# Source version: 0.4c modified at 2023.07.13
 
 import machine
 import uos
 import gc
+import utime
 
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.4d"
+        self.version = "0.8-xiao"
+        self.board = "Seeed XIAO RP2040"
+        self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
+        self.system_led = machine.Pin(25,machine.Pin.OUT)
+
+        self.prompt = "\nsmol $: "
         self.turbo = False
-        self.files = uos.listdir()
-        self.protected_files = { "boot.py", "main.py" }
+        self.thread_running = False
+        self.protected_files = { "boot.py","main.py","ws2812.py" }
         self.user_commands = {
-            "banner": self.banner,
             "help": self.help,
-            "ls": self.ls,
-            "cat": self.cat,
-            "rm": self.rm,
-            "cls": self.cls,
+            "list": self.ls,
+            "show": self.cat,
+            "remove": self.rm,
+            "clear": self.cls,
             "stats": self.stats,
-            "mhz": self.set_cpu_mhz,
             "turbo": self.toggle_turbo,
-            "ed": self.ed,
+            "edit": self.ed,
             "info": self.info,
-            "py": self.py
+            "py": self.py,
+            "led": self.led,
+            "exe": self.exe
+        }
+        self.user_commands_manual = {
+            "ls": "list files",
+            "show <filename>": "print filename content",
+            "info <filename>": "information about a file",
+            "remove <filename>": "remove a file (be careful!)",
+            "edit <filename>": "text editor, filename is optional",
+            "clear": "clears the screen",
+            "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
+            "stats": "system statistics",
+            "py <filename>": "runs user program",
+            "led <command>": "manipulating on-board LED. Commands: `on`, `off`.",
+            "exe <code>": "Running exec(code)."
+        }
+        self.ed_commands_manual = {
+            "help": "this help",
+            "n": "next page",
+            "b ": "back one page",
+            "10 <line of text>": "replacing 10-th line with a line of text",
+            "a": "append new line at the end of a file",
+            "write or save": "write changes to a file (not implemented yet)",
+            "quit": "quit"
         }
 
         self.boot()
 
     def boot(self):
-        self.set_cpu_mhz(80)
+        machine.freq(self.cpu_speed_range["turbo"] * 1000000)
         self.cls()
         self.welcome()
+        self.led("boot")
         while True:
-            user_input = input("\nsmol $: ")
+            user_input = input(self.prompt)
             parts = user_input.split()
             if len(parts) > 0:
                 command = parts[0]
@@ -49,71 +77,67 @@ class smolOS:
                     self.unknown_function()
 
     def banner(self):
-        print("______________________________________________")
-        print("                                 ______  _____")
+        print("\033[1;33;44m                                 ______  _____")
         print("           _________ ___  ____  / / __ \/ ___/")
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
-        print(" _[..]  /____/_/ /_/ /_/\____/_/\____//____/  ")
-        print("==============================================")
+        print("        /____/_/ /_/ /_/\____/_/\____//____/  ")
+        print("--------------\033[1;5;7mXIAO-RP2040-EDiTiON\033[0;1;33;44m--------------\n\033[0m")
 
     def welcome(self):
-        print("\n\n\n\n")
         self.banner()
-        print("\n")
         self.stats()
-        print("\n\n\n\n")
         self.print_msg("Type 'help' for a smol manual.")
-        print("\n")
+
+    def man(self,manual):
+        for cmd,desc in manual.items():
+            print("\t\033[7m"+cmd+"\033[0m -",desc)
+        utime.sleep(0.5)
 
     def help(self):
-        print(self.name+ " Version "+self.version+" user commands:\n")
-        print("\t`ls` - list files\n\t`cat filename` - print file\n\t`info filename` - info about selected file\n\t`rm filename` - remove file\n\t`ed filename` - text editor\n\t`banner` - system banner\n\t`cls` - clear screen\n\t`mhz` 160 - set CPU speed (80-160) in MHz\n\t`stats` - hardware and software information")
-        print("\nSystem created by Krzysztof Krystian Jankowski")
-        print("Code available at github and smol.p1x.in/os/")
+        print(self.name+ " version "+self.version+" user commands:\n")
+        self.man(self.user_commands_manual)
+        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski.")
+        print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
 
     def print_err(self, error):
-        print("\n\t<!>",error,"<!>")
+        print("\n\033[1;37;41m\t<!>",error,"<!>\t\033[0m")
+        utime.sleep(1)
 
     def print_msg(self, message):
-        print("\n\t->",message)
+        print("\n\033[1;34;47m\t->",message,"\t\033[0m")
+        utime.sleep(0.5)
 
     def unknown_function(self):
         self.print_err("unknown function. Try 'help'.")
 
-    def set_cpu_mhz(self,freq="80"):
-        freq = int(freq)
-        if freq >= 80 and freq <= 160:
-            machine.freq(freq * 1000000)
-            self.print_msg("CPU frequency set to "+str(freq))
-        else:
-            self.print_err("wrong CPU frequency. Use between 80 and 160 MHz.")
-
     def toggle_turbo(self):
+        freq = self.cpu_speed_range["turbo"]
         if self.turbo:
-            self.set_cpu_mhz("80")
-        else:
-            self.set_cpu_mhz("160")
+             freq = self.cpu_speed_range["slow"]
+        machine.freq(freq * 1000000)
         self.turbo = not self.turbo
+        self.print_msg("CPU speed set to "+str(freq)+" Mhz")
 
     def stats(self):
-        print("Board:",machine.unique_id())
-        print("MicroPython:",uos.uname().release)
-        print(self.name + ":",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
-        print("Firmware:",uos.uname().version)
-        print("CPU Speed:",machine.freq()*0.000001,"MHz")
-        print("Free/All memory:",gc.mem_free(),"bytes","/", uos.statvfs("/")[1] * uos.statvfs("/")[2], "bytes")
-        print("Free space:",uos.statvfs("/")[0] * uos.statvfs("/")[2],"bytes")
+        print("\t\033[0mBoard:\033[1m",self.board)
+        print("\t\033[0mMicroPython:\033[1m",uos.uname().release)
+        print("\t\033[0m"+self.name + ":\033[1m",self.version,"(size:",uos.stat("main.py")[6],"bytes)")
+        print("\t\033[0mFirmware:\033[1m",uos.uname().version)
+        turbo_msg = "\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
+        if self.turbo:
+            turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` again for slow mode."
+        print("\t\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
+        print("\t\033[0mFree memory:\033[1m",gc.mem_free(),"bytes")
+        print("\t\033[0mUsed space:\033[1m",uos.stat("/")[0],"bytes")
+        print("\t\033[0mFree space:\033[1m",uos.statvfs("/")[0] * uos.statvfs("/")[3],"bytes")
 
     def cls(self):
          print("\033[2J")
 
     def ls(self):
         for file in uos.listdir():
-            file_size = uos.stat(file)[6]
-            additional = ""
-            if file in self.protected_files: info = "protected system file"
-            print(file,"\t", file_size, "bytes", "\t"+additional)
+            self.info(file)
 
     def info(self,filename=""):
         if filename == "":
@@ -122,7 +146,7 @@ class smolOS:
         additional = ""
         file_size = uos.stat(filename)[6]
         if filename in self.protected_files: additional = "protected system file"
-        print(filename,"\t",file_size,"bytes","\t"+additional)
+        print("\t\033[4m"+filename+"\033[0m\t", file_size, "bytes", "\t"+additional)
 
 
     def cat(self,filename=""):
@@ -149,47 +173,67 @@ class smolOS:
             return
         exec(open(filename).read())
 
+    def exe(self,command):
+        exec(command)
+
+    def led(self,cmd="on"):
+        if cmd in ("on",""):
+            self.system_led.value(0)
+            return
+        if cmd=="off":
+            self.system_led.value(1)
+            return
+        if cmd=="boot":
+            for _ in range(4):
+                self.system_led.value(0)
+                utime.sleep(0.1)
+                self.system_led.value(1)
+                utime.sleep(0.05)
+            self.system_led.value(1)
+            return
+
     # smolEDitor
     # Minimum viable text editor
     def ed(self, filename=""):
         self.page_size = 10
-        self.cls()
-        print("Welcome to smolEDitor\nA smol text editor for smol operating system\n\nWrite h for help\nq to quit\n\n")
+        self.file_edited = False
+        print("Welcome to \033[7msmolEDitor\033[0m\nMinimum viable text editor for smol operating system")
         try:
             with open(filename,'r+') as file:
-                print("\nEditing "+filename+" file\n")
+                if filename in self.protected_files:
+                    self.print_err("Protected file. View only.")
+                self.print_msg("Loaded existing "+filename+" file.")
                 lines = file.readlines()
                 line_count = len(lines)
                 start_index = 0
-                message,error = "",""
 
                 while True:
                     if start_index < line_count:
                         end_index = min(start_index + self.page_size,line_count)
                         print_lines = lines[start_index:end_index]
 
-                        print("-> Page:",start_index % self.page_size,"Lines:",line_count)
+                        print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
 
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            print("{}: {}".format(line_num,line.strip()))
+                            print("{}: {}".format(f"{line_num:03}",line.strip()))
 
-                        if line_count > self.page_size:
-                            message = "`b` back,`n` next page\n" + message
-
-                    if not message == "":
-                        print("-> ",message)
-                    if not error == "":
-                        self.print_err(error)
-                    message,error = "",""
                     user_ed_input = input("\ned $: ")
 
-                    if user_ed_input in ("q","quit"):
+                    if user_ed_input =="quit":
+                        if self.file_edited:
+                            self.print_msg("file was edited, `save` it first or write `quit!`")
+                        else:
+                            self.print_msg("smolEDitor closed")
+                            break
+
+                    if user_ed_input == "quit!":
+                        self.print_msg("smolEDitor closed")
                         break
 
-                    if user_ed_input in ("h","help"):
-                        message = "smolEDitor minimum viable text editor\n\n`n` - next",self.page_size,"lines\n`b` - back",self.page_size,"lines\n`n text` - replacing n line with a text\n`a`,`add` - add new line\n`w`,`write`,'save' - write to file\n`h` - this help\n`q` - quit\n"
+                    if user_ed_input == "help":
+                        self.man(self.ed_commands_manual)
 
-                    if user_ed_input in ("a","add"):
+                    if user_ed_input == "a":
                         line_count += 1
                         lines.append("")
 
@@ -197,26 +241,34 @@ class smolOS:
                         if start_index+self.page_size < line_count:
                             start_index += self.page_size
                         else:
-                            error = "out of lines in this file."
+                            self.print_msg("There is no next page. This is the last page.")
 
                     if user_ed_input == "b":
                         if start_index-self.page_size >= 0:
                             start_index -= self.page_size
                         else:
-                            error = "out of lines in this file."
+                            self.print_msg("Can not go back, it is a first page already.")
 
-                    if user_ed_input in ("w","write","save"):
-                        error = "Saving implemented yet"
+                    if user_ed_input in ("save","write"):
+                        if filename in self.protected_files:
+                            self.print_err("Protected file")
+                        else:
+                            self.print_err("Saving not implemented yet")
 
                     parts = user_ed_input.split(" ",1)
                     if len(parts) == 2:
-                        line_number = int(parts[0])
-                        new_content = parts[1]
-
-                        if line_number > 0 and line_number < line_count:
-                            lines[line_number - 1] = new_content + "\n"
+                        if filename in self.protected_files:
+                            self.print_err("Protected file")
                         else:
-                            error = "Invalid line number."
+                            line_number = int(parts[0])
+                            new_content = parts[1]
+                            self.file_edited = True
+
+                            if line_number > 0 and line_number < line_count:
+                                lines[line_number - 1] = new_content + "\n"
+                            else:
+                                self.print_err("Invalid line number")
+
 
         except OSError:
             if filename == "":
@@ -225,4 +277,3 @@ class smolOS:
                 self.print_err("Failed to open the file.")
 
 smol = smolOS()
-
