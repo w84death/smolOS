@@ -3,6 +3,7 @@ import utime
 import _thread
 import time
 import neopixel
+import math
 
 class neo_grid():
     def __init__(self):
@@ -136,9 +137,26 @@ class neo_grid():
     def color(self,rgb_color=""):
         return
     
-    def rainbow(self):
-        return
-    
+    def plasma(self):
+        t=0
+        z=0.33
+        pow=0.1
+        while self.thread_running:
+            for p in range(25):
+                x=p%5-2
+                y=p/5-2
+                c=math.sin(math.sin(x*z+math.cos(t*.3)*13) + math.cos(y*z+math.sin(t*.2)*17))
+                c=(128+int(c*128))*pow
+                if self.hearth_bitmap[24-p]==0:
+                    c=c*0.025  
+                self.pixels[p]=(
+                    int(c+5+math.sin(t*0.21)*5),
+                    int(c+5+math.sin(1+t*0.33)*5),
+                    int(c+5+math.sin(1+t*0.47)*5))
+            self.pixels.write()
+            t+=0.05
+
+
     def rainbow_thread(self):
         return
 
@@ -146,14 +164,13 @@ class neo_grid():
         self.thread_running = False
         print("NeoPixel: Thread stopped. Use grid.start()")
 
-    def start(self):
+    def start(self,fn):
         if not self.thread_running:
             self.thread_running = True
-            _thread.start_new_thread(self.marquee,())
+            _thread.start_new_thread(fn,())
             print("NeoPixel: Marquee thread started in background. Use grid.stop()")
         else:
             print("NeoPixel: Thread already used. Use grid.stop()")
 
 grid = neo_grid()
-grid.start()
-
+grid.start(grid.plasma)
