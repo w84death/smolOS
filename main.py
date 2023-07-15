@@ -9,13 +9,13 @@ import utime
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.8-xiao"
+        self.version = "0.8a-xiao"
         self.board = "Seeed XIAO RP2040"
         self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
         self.system_led = machine.Pin(25,machine.Pin.OUT)
 
         self.prompt = "\nsmol $: "
-        self.turbo = False
+        self.turbo = True
         self.thread_running = False
         self.protected_files = { "boot.py","main.py","ws2812.py" }
         self.user_commands = {
@@ -169,9 +169,9 @@ class smolOS:
 
     def py(self,filename=""):
         if filename == "":
-            self.print_err("Specify a file name to run.")
+            self.print_err("Specify a file name to run (without .py).")
             return
-        exec(open(filename).read())
+        exec(open(filename+".py").read())
 
     def exe(self,command):
         exec(command)
