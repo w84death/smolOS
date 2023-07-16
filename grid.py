@@ -15,15 +15,15 @@ class neo_grid():
         self.brightness = 0.2
         self.palette = [
             (0,0,0),
-            (10,10,10),
-            (10,5,5),
-            (10,2,2),
-            (5,0,5),
-            (0,0,20),
-            (1,0,20),
-            (0,0,5),
-            (0,0,5),
-            (20,20,10)]
+            (100,100,100),
+            (100,50,50),
+            (100,20,20),
+            (50,0,50),
+            (0,0,200),
+            (10,0,200),
+            (0,0,50),
+            (0,0,50),
+            (200,200,100)]
 
         self.empty_bitmap = [
             0,0,0,0,0,
@@ -101,7 +101,7 @@ class neo_grid():
         screen_len=25
         offset=-50
         fast=0.05
-        swlow=0.12
+        slow=0.12
         len=(25*5)+1
         bitmap=self.logo_bitmap
         bitmap_id=0
@@ -158,7 +158,8 @@ class neo_grid():
             time+=0.05
 
     def demo(self):
-        self.start(self.plasma)
+        #self.start(self.plasma)
+        self.start(self.marquee)
 
     def stop(self):
         self.thread_running = False
