@@ -4,26 +4,27 @@ import _thread
 import time
 import neopixel
 import math
+import random
 
 class neo_grid():
     def __init__(self):
         self.thread_running = False
-        
+
         self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((0,0,0))
         self.pixels.write()
         self.brightness = 0.2
         self.palette = [
             (0,0,0),
-            (100,100,100),
-            (100,50,50),
-            (100,20,20),
-            (50,0,50),
-            (0,0,200),
-            (10,0,200),
-            (0,0,50),
-            (0,0,50),
-            (200,200,100)]
+            (50,50,50),
+            (50,25,25),
+            (50,10,10),
+            (25,0,25),
+            (10,10,10),
+            (124,54,23),
+            (3,12,10),
+            (0,0,25),
+            (100,100,50)]
 
         self.empty_bitmap = [
             0,0,0,0,0,
@@ -32,7 +33,7 @@ class neo_grid():
             0,0,0,0,0,
             0,0,0,0,0,
         ]
-        
+
         self.hearth_bitmap = [
             0,2,2,0,0,
             2,1,3,3,0,
@@ -42,17 +43,17 @@ class neo_grid():
         ]
 
         self.p1x_bitmap = [
-            6,6,5,5,6,
-            6,0,5,0,0,
-            5,5,5,0,0,
-            0,7,0,0,0,
-            6,6,6,6,5,
+            1,1,1,1,1,
+            1,0,1,0,0,
+            1,1,1,0,0,
+            0,5,0,0,0,
+            1,1,1,1,1,
             0,0,0,0,0,
-            6,5,0,6,5,
-            0,0,7,0,0,
-            6,5,0,6,5,
+            1,1,0,1,1,
+            0,0,1,0,0,
+            1,1,0,1,1,
         ]
-        
+
         # smolOS
         self.logo_bitmap=[
             8,8,8,8,9,
@@ -76,7 +77,7 @@ class neo_grid():
             8,9,8,8,9,
             9,8,8,8,9,
             9,8,8,9,8,
-            8,9,9,8,8,            
+            8,9,9,8,8,
             8,8,8,8,9,
             8,9,9,8,9,
             9,8,8,9,8,
@@ -84,6 +85,44 @@ class neo_grid():
             8,8,8,8,8,
         ]
 
+        self.buddy_bitmap = [
+            1,0,1,1,5,
+            1,1,6,1,1,
+            1,0,1,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+
+        self.buddy_bitmap2 = [
+            1,5,1,1,5,
+            1,1,6,1,1,
+            1,5,1,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+
+        self.buddy_bitmap3 = [
+            7,1,6,1,5,
+            1,0,1,1,1,
+            1,1,1,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+        self.buddy_bitmap4 = [
+            1,1,1,1,5,
+            1,0,1,1,1,
+            7,1,6,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+
+        self.buddy_bitmap5 = [
+            7,1,0,1,5,
+            7,1,1,6,1,
+            7,1,0,1,1,
+            7,7,5,1,5,
+            7,7,1,7,7,
+        ]
 
         print("NeoPixel Grid: Initialized.\bUse grid.demo(), grid.stop(), grid.color(\"r,g,b\"), grid.hearth().")
 
@@ -94,7 +133,7 @@ class neo_grid():
                     self.pixels[24-i]=bg
                 else:
                     self.pixels[24-i]=self.palette[bitmap[i+offset]]
-            i=i+1 
+            i=i+1
         self.pixels.write()
 
     def marquee(self):
@@ -112,7 +151,7 @@ class neo_grid():
                 utime.sleep(slow)
                 if len==screen_len:
                     utime.sleep(slow*10)
-            else:   
+            else:
                 utime.sleep(fast)
             offset += 5
             if offset >= len:
@@ -126,18 +165,31 @@ class neo_grid():
                 if bitmap_id==2:
                     bitmap=self.p1x_bitmap
                     bg=0
-                    len=9*5                
+                    len=9*5
                 if bitmap_id in (1,3):
                     bitmap=self.hearth_bitmap
                     len=25
                     bg=4
+
+    def buddy(self):
+        anim = [
+            self.buddy_bitmap,
+            self.buddy_bitmap2,
+            self.buddy_bitmap3,
+            self.buddy_bitmap4,
+            self.buddy_bitmap5,
+            ]
+        while self.thread_running:
+            frame = random.choice(anim)
+            grid.draw(frame)
+            utime.sleep(random.uniform(0.5, 3.0))
 
     def hearth(self):
         self.draw(self.hearth_bitmap)
 
     def color(self,rgb_color=""):
         return
-    
+
     def plasma(self):
         time=0
         zoom=0.33
@@ -159,7 +211,8 @@ class neo_grid():
 
     def demo(self):
         #self.start(self.plasma)
-        self.start(self.marquee)
+        #self.start(self.marquee)
+        self.start(self.buddy)
 
     def stop(self):
         self.thread_running = False
