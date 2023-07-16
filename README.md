@@ -3,7 +3,9 @@
 smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266 and RP2040) giving the user POSIX-like environment to play.
 
 
-![smolOS in color version 0.7](media/smolos-color.png)
+![smolOS version 0.8a-XIAO](media/smolos-08a.png)
+![smolOS commands version 0.8a-XIAO](media/commands-08a.png)
+![smolOS editor version 0.8a-XIAO](media/editor-08a.png)
 
 Latest documentation available at official homepage:
 - [smolOS homepage (http)](http://smol.p1x.in/os/)
@@ -38,7 +40,6 @@ Just put ```main.py``` into the board (that has latest MicroPython firmware) and
 ### Detailed Guides
 * [ESP8266 Guide](ESP8266.md)
 * [XIAO RP2040 Guide](XIAO-RP2040.md)
-
 
 ## Connecting
 As normal user:
@@ -87,8 +88,6 @@ smol $:
 ```
 
 
-![import and run](media/reset.png)
-
 If you close the system or encurage a fatal error start OS again. In MicroPython REPL write:
 ```
 >>> smolOS()
@@ -100,17 +99,8 @@ Or restart device:
 ```
 
 ## Using
-![Welcome screen](media/smolos.png)
 
-Write `help` for help :)
-
-### Example user session
-![Sample user session](media/commands.png)
-
-### smolEDitor
-First application: `ed`! Almost complete but very simple text editor.
-
-![smolEDitor session](media/smoleditor.png)
+Write `help` for manual :)
 
 
 ## Articles
