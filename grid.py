@@ -85,44 +85,7 @@ class neo_grid():
             8,8,8,8,8,
         ]
 
-        self.buddy_bitmap = [
-            1,0,1,1,5,
-            1,1,6,1,1,
-            1,0,1,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
 
-        self.buddy_bitmap2 = [
-            1,5,1,1,5,
-            1,1,6,1,1,
-            1,5,1,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-
-        self.buddy_bitmap3 = [
-            7,1,6,1,5,
-            1,0,1,1,1,
-            1,1,1,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-        self.buddy_bitmap4 = [
-            1,1,1,1,5,
-            1,0,1,1,1,
-            7,1,6,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-
-        self.buddy_bitmap5 = [
-            7,1,0,1,5,
-            7,1,1,6,1,
-            7,1,0,1,1,
-            7,7,5,1,5,
-            7,7,1,7,7,
-        ]
 
         print("NeoPixel Grid: Initialized.\bUse grid.demo(), grid.stop(), grid.color(\"r,g,b\"), grid.hearth().")
 
@@ -172,17 +135,94 @@ class neo_grid():
                     bg=4
 
     def buddy(self):
+        buddy0_bitmap = [
+            7,7,7,7,7,
+            7,7,7,7,7,
+            7,7,7,7,7,
+            7,7,7,7,7,
+            7,7,7,7,7,
+        ]
+        buddy1_bitmap = [
+            7,7,7,7,7,
+            7,7,7,7,7,
+            7,7,7,1,7,
+            7,7,7,5,7,
+            7,7,7,7,7,
+        ]
+        buddy2_bitmap = [
+            7,7,7,7,7,
+            7,7,7,7,7,
+            7,7,0,1,7,
+            7,7,5,5,7,
+            7,7,7,7,7,
+        ]
+        buddy3_bitmap = [
+            7,7,7,7,7,
+            7,1,0,1,7,
+            7,1,1,6,7,
+            7,1,0,1,7,
+            7,7,7,7,7,
+        ]
+        buddy4_bitmap = [
+            1,0,1,1,5,
+            1,1,6,1,1,
+            1,0,1,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+        buddy5_bitmap = [
+            1,5,1,1,5,
+            1,1,6,1,1,
+            1,5,1,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+        buddy6_bitmap = [
+            7,1,6,1,5,
+            1,0,1,1,1,
+            1,1,1,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+        buddy7_bitmap = [
+            1,1,1,1,5,
+            1,0,1,1,1,
+            7,1,6,1,1,
+            7,7,7,1,5,
+            7,7,7,5,7,
+        ]
+        buddy8_bitmap = [
+            7,1,0,1,5,
+            7,1,1,6,1,
+            7,1,0,1,1,
+            7,7,5,1,5,
+            7,7,1,7,7,
+        ]
         anim = [
-            self.buddy_bitmap,
-            self.buddy_bitmap2,
-            self.buddy_bitmap3,
-            self.buddy_bitmap4,
-            self.buddy_bitmap5,
-            ]
+            buddy4_bitmap,
+            buddy5_bitmap,
+            buddy6_bitmap,
+            buddy7_bitmap,
+            buddy8_bitmap,
+        ]
+        anim_intro = [
+            buddy0_bitmap,
+            buddy1_bitmap,
+            buddy0_bitmap,
+            buddy1_bitmap,
+            buddy2_bitmap,
+            buddy3_bitmap,
+            buddy4_bitmap,
+        ]
+
+        for frame in anim_intro:
+            grid.draw(frame)
+            utime.sleep(1)
+
         while self.thread_running:
             frame = random.choice(anim)
             grid.draw(frame)
-            utime.sleep(random.uniform(0.5, 3.0))
+            utime.sleep(random.uniform(0.25, 2.0))
 
     def hearth(self):
         self.draw(self.hearth_bitmap)
@@ -228,3 +268,4 @@ class neo_grid():
 
 grid = neo_grid()
 grid.demo()
+
