@@ -99,6 +99,8 @@ class neo_grid():
             i=i+1
         self.pixels.write()
 
+    
+
     def marquee(self):
         screen_len=25
         offset=-50
