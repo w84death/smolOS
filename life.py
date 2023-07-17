@@ -13,9 +13,10 @@ class Life():
     def __init__(self):
         self.world = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.temp  = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.disp   = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.world_size = 25
         self.period = 0
-        self.delay = 0.333
+        self.delay = 0.2
         self.thread_running = False       
         self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((5,32,10))
@@ -24,7 +25,8 @@ class Life():
     def random_seed(self):
         for i in range(self.world_size):
             self.world[i] = random.randint(0,1)
-
+            self.disp[i] = 0
+            
     def update_world(self):
         for i in range(self.world_size):
             self.world[i] = self.temp[i]
@@ -58,14 +60,22 @@ class Life():
                     self.temp[i] = 1
                     stable=False
                 else:
-                    self.temp[i]=0
+                    self.temp[i]=0 
             i+=1
         return not stable
     
-    def draw_world(self):
-        palette = [(0,0,5),(0,32,5)]
-        for i in range(self.world_size):
-            self.pixels[i]=palette[self.world[i]]
+    def draw_world(self,forground=(0,16,4)):
+        background = (0,0,10)
+        for cell in range(self.world_size):
+            if self.world[cell] == 1:
+                self.disp[cell] = 10
+                color=forground
+            else:
+                if self.disp[cell]>1:
+                    self.disp[cell] -= 2                
+                color = (0,int(self.disp[cell]*0.25),self.disp[cell])
+            
+            self.pixels[cell]=color
         self.pixels.write()
     
     def simulate(self):
@@ -74,13 +84,16 @@ class Life():
         while self.thread_running:
             if self.check_world():
                 self.update_world()
-                self.draw_world()
-                utime.sleep(self.delay)
+                for _ in range(3):
+                    self.draw_world()
+                    utime.sleep(self.delay)
             else:
-                utime.sleep(1)
+                for _ in range(10):
+                    self.draw_world()
+                    utime.sleep(self.delay)
                 self.random_seed()
-                self.draw_world()
-                utime.sleep(1)
+                self.draw_world((12,12,0))
+                utime.sleep(0.5)
                     
     def begin(self):
         self.start(self.simulate)
