@@ -9,7 +9,7 @@ import utime
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.8a-xiao"
+        self.version = "0.8b-xiao"
         self.board = "Seeed XIAO RP2040"
         self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
         self.system_led = machine.Pin(25,machine.Pin.OUT)
@@ -47,10 +47,10 @@ class smolOS:
         }
         self.ed_commands_manual = {
             "help": "this help",
-            "n": "next page",
-            "b ": "back one page",
+            ">": "next page",
+            "<": "previous page",
             "10 <line of text>": "replacing 10-th line with a line of text",
-            "a": "append new line at the end of a file",
+            "append <lines>": "append new line(s) at the end of a file, default 1",
             "write or save": "write changes to a file (not implemented yet)",
             "quit": "quit"
         }
@@ -62,7 +62,6 @@ class smolOS:
         self.cls()
         self.welcome()
         self.led("boot")
-        self.py("grid")
         while True:
             user_input = input(self.prompt)
             parts = user_input.split()
@@ -234,17 +233,17 @@ class smolOS:
                     if user_ed_input == "help":
                         self.man(self.ed_commands_manual)
 
-                    if user_ed_input == "a":
+                    if user_ed_input == "append":
                         line_count += 1
                         lines.append("")
 
-                    if user_ed_input == "n":
+                    if user_ed_input == ">":
                         if start_index+self.page_size < line_count:
                             start_index += self.page_size
                         else:
                             self.print_msg("There is no next page. This is the last page.")
 
-                    if user_ed_input == "b":
+                    if user_ed_input == "<":
                         if start_index-self.page_size >= 0:
                             start_index -= self.page_size
                         else:
@@ -258,18 +257,22 @@ class smolOS:
 
                     parts = user_ed_input.split(" ",1)
                     if len(parts) == 2:
-                        if filename in self.protected_files:
-                            self.print_err("Protected file")
+                        if parts[0] == "append":
+                            new_lines = int(parts[1])
+                            line_count += new_lines
+                            for _ in range(new_lines):
+                                lines.append("")
                         else:
-                            line_number = int(parts[0])
-                            new_content = parts[1]
-                            self.file_edited = True
-
-                            if line_number > 0 and line_number < line_count:
-                                lines[line_number - 1] = new_content + "\n"
+                            if filename in self.protected_files:
+                                self.print_err("Protected file")
                             else:
-                                self.print_err("Invalid line number")
-
+                                line_number = int(parts[0])
+                                new_content = parts[1]                                
+                                if line_number > 0 and line_number < line_count:
+                                    lines[line_number - 1] = new_content + "\n"
+                                else:
+                                    self.print_err("Invalid line number")
+                        self.file_edited = True
 
         except OSError:
             if filename == "":

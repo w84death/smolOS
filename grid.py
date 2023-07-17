@@ -9,7 +9,8 @@ import random
 class neo_grid():
     def __init__(self):
         self.thread_running = False
-
+        self.scroll_running = True
+        
         self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((0,0,0))
         self.pixels.write()
@@ -27,14 +28,26 @@ class neo_grid():
             (100,100,50)]
 
         self.hearth_bitmap = [
+            4,1,1,4,4,
+            1,1,1,1,4,
+            4,1,1,1,1,
+            1,1,1,1,4,
+            4,1,1,4,4,
+        ]
+
+        self.hearth_color_bitmap = [
             0,2,2,0,0,
             2,1,3,3,0,
             0,2,3,3,4,
             3,3,3,4,0,
             0,4,4,0,0,
         ]
-
         self.p1x_bitmap = [
+            0,0,0,0,0,
+            5,5,5,5,5,
+            0,5,5,5,0,
+            0,0,5,0,0,
+            0,0,0,0,0,
             1,1,1,1,1,
             1,0,1,0,0,
             1,1,1,0,0,
@@ -44,6 +57,12 @@ class neo_grid():
             1,1,0,1,1,
             0,0,1,0,0,
             1,1,0,1,1,
+            0,0,0,0,0,
+            0,0,5,0,0,
+            0,5,5,5,0,
+            5,5,5,5,5,            
+            0,0,0,0,0,
+            
         ]
 
         # smolOS banner
@@ -79,10 +98,23 @@ class neo_grid():
 
         print("NeoPixel Grid: Initialized.\bUse grid.demo(), grid.stop(), grid.color(\"r,g,b\").")
 
-    def draw(self,bitmap,offset=0,len=25,bg=(0,0,0)):
+    def draw(self,bitmap,offset=0,bg=(0,0,0)):
+        bit_len=len(bitmap)
+        padding=100
+        bright=0.0
         for i in range(25):
-            if i+offset<0 or i+offset>len-1:
-                self.pixels[24-i]=bg
+            if i+offset<0 or i+offset>bit_len-1:
+                #gradient
+                if i%5==0:
+                    if offset<0:
+                        bright = (padding+offset)*0.005
+                    else:
+                        bright = (padding-(offset-bit_len))*0.005
+                r=int(bg[0]*bright)
+                g=int(bg[1]*bright)
+                b=int(bg[2]*bright)
+                
+                self.pixels[24-i]=(r,g,b)
             else:
                 self.pixels[24-i]=self.palette[bitmap[i+offset]]
         self.pixels.write()
@@ -95,7 +127,28 @@ class neo_grid():
                 if not self.thread_running: return
                 self.draw(self.get_glyf_bitmap(glyf.lower()))
                 utime.sleep(0.33)
-                
+
+    def marquee(self,bitmap,bg=0,loop=False):
+        screen_len=25
+        offset_len=100
+        offset=-offset_len
+        delay=0.08
+        pause=0.12
+        bit_len=len(bitmap)
+        while self.scroll_running:
+            self.draw(bitmap,offset,self.palette[bg])
+            if offset==0 and bit_len == screen_len:
+                utime.sleep(pause)
+            else:
+                utime.sleep(delay)
+            offset += 5
+            if offset >= bit_len+offset_len:
+                offset=-offset_len
+                if not loop:
+                    return
+            if not self.scroll_running:
+                return                
+
     def draw_random_numbers(self):
         while self.thread_running:
             self.draw(self.get_glyf_bitmap(str(random.randint(0,9))))
@@ -127,52 +180,30 @@ class neo_grid():
         hex_value = hex(int(binary_string, 2))
         print(hex_value)
 
-    def marquee(self):
-        screen_len=25
-        offset=-50
-        fast=0.05
-        slow=0.12
-        len=(25*5)+1
-        bitmap=self.logo_bitmap
-        bitmap_id=0
-        bg=8
-        while self.thread_running:
-            self.draw(bitmap,offset,len,self.palette[bg])
-            if offset==0 or (len>screen_len and offset<len-10 and offset>0):
-                utime.sleep(slow)
-                if len==screen_len:
-                    utime.sleep(slow*10)
-            else:
-                utime.sleep(fast)
-            offset += 5
-            if offset >= len:
-                offset=-50
-                bitmap_id+=1
-                if bitmap_id>3: bitmap_id=0
-                if bitmap_id==0:
-                    bitmap=self.logo_bitmap
-                    len=(25*5)+5
-                    bg=8
-                if bitmap_id==2:
-                    bitmap=self.p1x_bitmap
-                    bg=0
-                    len=9*5
-                if bitmap_id in (1,3):
-                    bitmap=self.hearth_bitmap
-                    len=25
-                    bg=4
-
     def hearth(self):
         self.draw(self.hearth_bitmap)
 
-    def color(self,rgb_color=""):
-        return
+    def color(self,rgb_color=(0,0,0)):
+        self.pixels.fill(rgb_color)
+        self.pixels.write()
 
+    def scroller(self):
+        while self.thread_running:
+            self.marquee(self.p1x_bitmap,5)
+            self.marquee(self.hearth_bitmap,4)
+            self.marquee(self.logo_bitmap,8)
+            self.marquee(self.logo_bitmap,8,True)
+            
+        self.color()
+        
     def demo(self):
-        self.start(self.draw_sample_message)
+        self.start(self.scroller)
 
     def stop(self):
         self.thread_running = False
+        self.scroll_running = False
+        utime.sleep(0.5)
+        self.scroll_running = True
         print("NeoPixel: Thread stopped. Use grid.start()")
 
     def start(self,fn):
