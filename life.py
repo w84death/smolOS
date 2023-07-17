@@ -15,7 +15,7 @@ class Life():
         self.temp  = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.world_size = 25
         self.period = 0
-        self.delay = 0.1
+        self.delay = 0.333
         self.thread_running = False       
         self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((5,32,10))
@@ -48,20 +48,22 @@ class Life():
             density += self.get_cell_value(i+5)
             density += self.get_cell_value(i+6)
             if cell == 1:
-                if density<3 or density>5:
+                if density<2 or density>3:
                     self.temp[i] = 0
                     stable=False
                 else:
                     self.temp[i] = 1
             if cell == 0:
-                if density==4:
+                if density==3:
                     self.temp[i] = 1
                     stable=False
+                else:
+                    self.temp[i]=0
             i+=1
         return not stable
     
     def draw_world(self):
-        palette = [(0,0,5),(0,128,10)]
+        palette = [(0,0,5),(0,32,5)]
         for i in range(self.world_size):
             self.pixels[i]=palette[self.world[i]]
         self.pixels.write()
