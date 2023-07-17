@@ -7,15 +7,12 @@ class neo_pixel():
         self.thread_running = False
         self.power = machine.Pin(11,machine.Pin.OUT)
         self.power.value(1)
-        self.grid = neopixel.NeoPixel(machine.Pin(12),1)
+        self.pixel = neopixel.NeoPixel(machine.Pin(12),1)
         print("NeoPixel: Initialized.\bUse pixel.start(), pixel.stop(), pixel.color(\"r,g,b\").")
 
-    def color(self,rgb_color=""):
-        if rgb_color="":
-            rgb_color=(0,0,0)
-        color = tuple(map(int, rgb_color.split(',')))
-        self.grid.fill(color)
-        self.grid.write()
+    def color(self,color=(0,0,0)):
+        self.pixel.fill(color)
+        self.pixel.write()
 
     def stop(self):
         self.thread_running = False
@@ -37,9 +34,8 @@ class neo_pixel():
                 green = int((105 * brightness) / 255)
                 blue = int((180 * brightness) / 255)
 
-                self.grid.pixels_fill((red, green, blue))
-                self.grid.pixels_show()
+                self.pixel.fill((red, green, blue))
+                self.pixel.write()
                 utime.sleep(0.05)
 
 pixel = neo_pixel()
-

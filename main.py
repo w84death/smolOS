@@ -9,7 +9,7 @@ import utime
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.8b-xiao"
+        self.version = "0.8c-xiao"
         self.board = "Seeed XIAO RP2040"
         self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
         self.system_led = machine.Pin(25,machine.Pin.OUT)
@@ -17,7 +17,7 @@ class smolOS:
         self.prompt = "\nsmol $: "
         self.turbo = False
         self.thread_running = False
-        self.protected_files = { "boot.py","main.py","ws2812.py" }
+        self.protected_files = { "boot.py","main.py" }
         self.user_commands = {
             "help": self.help,
             "list": self.ls,
