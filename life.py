@@ -1,3 +1,7 @@
+# Game of Life implementation for NeoPixel Grid 5x5 BFF
+# Port by Krzysztof Krystian Jankowski
+# (c)203.07
+
 import utime
 import _thread
 import time
@@ -7,8 +11,8 @@ import random
 
 class Life():
     def __init__(self):
-        self.world_live = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        self.world_next = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.world = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        self.temp  = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         self.world_size = 25
         self.period = 0
         self.delay = 0.1
@@ -19,36 +23,63 @@ class Life():
 
     def random_seed(self):
         for i in range(self.world_size):
-            self.world_live[i] = random.randint(0,1)
+            self.world[i] = random.randint(0,1)
 
     def update_world(self):
-        self.world_live = self.world_next
-        
-    def check_cell(self,cells):
-        alive = True
-        density = 0
-        for cell in cells:
-            density+=cell
-        if cells[4]==0 and density==4:
-            alive = True
-        if cells[4]==1 and (density<=3 or density>4):
-            alaive = False
-        return alive
+        for i in range(self.world_size):
+            self.world[i] = self.temp[i]
+
+    def get_cell_value(self,i):
+        if i<0 or i>=len(self.world):
+            return 0
+        return self.world[i]
+    
+    def check_world(self):
+        i=0
+        stable = True
+        for cell in self.world:
+            density=0
+            density += self.get_cell_value(i-1)
+            density += self.get_cell_value(i+1)
+            density += self.get_cell_value(i-6)
+            density += self.get_cell_value(i-5)
+            density += self.get_cell_value(i-4)
+            density += self.get_cell_value(i+4)
+            density += self.get_cell_value(i+5)
+            density += self.get_cell_value(i+6)
+            if cell == 1:
+                if density<3 or density>5:
+                    self.temp[i] = 0
+                    stable=False
+                else:
+                    self.temp[i] = 1
+            if cell == 0:
+                if density==4:
+                    self.temp[i] = 1
+                    stable=False
+            i+=1
+        return not stable
     
     def draw_world(self):
-        palette = [(0,0,0),(12,64,12)]
+        palette = [(0,0,5),(0,128,10)]
         for i in range(self.world_size):
-            self.pixels[i]=palette[self.world_live[i]]
+            self.pixels[i]=palette[self.world[i]]
         self.pixels.write()
     
     def simulate(self):
         self.random_seed()
         self.draw_world()
         while self.thread_running:
-            self.random_seed()
-            self.draw_world()
-            utime.sleep(0.333)
-        
+            if self.check_world():
+                self.update_world()
+                self.draw_world()
+                utime.sleep(self.delay)
+            else:
+                utime.sleep(1)
+                self.random_seed()
+                self.draw_world()
+                utime.sleep(1)
+                    
     def begin(self):
         self.start(self.simulate)
 

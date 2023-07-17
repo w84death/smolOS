@@ -62,6 +62,7 @@ class smolOS:
         self.cls()
         self.welcome()
         self.led("boot")
+        self.py("life")
         while True:
             user_input = input(self.prompt)
             parts = user_input.split()
