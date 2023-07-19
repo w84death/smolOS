@@ -1,8 +1,6 @@
 from machine import Pin, PWM
 import time
 import _thread
-import neopixel
-from grid import neo_grid
 
 class smolBuzzer():
     def __init__(self):
@@ -18,10 +16,7 @@ class smolBuzzer():
         }
 
         self.buzzer = PWM(Pin(3, Pin.OUT))
-        self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
-        self.grid = neo_grid()
         self.play_note('C',0.2)
-        self.grid.draw_text("buzzer")
         print("smolBuzzer: buzz.play_note('A',0.2), buzz.play_demo(), buzz.stop().")
         
     def play_note(self,note,duration):
@@ -61,7 +56,6 @@ class smolBuzzer():
                 if not self.thread_running:
                         return
                 print("smoBuzzer: Track",no)
-                self.grid.draw_text(str(no))
                 for prog in range(repeat):
                     progress = "#"
                     for _ in range(prog):
@@ -74,7 +68,6 @@ class smolBuzzer():
                         if not self.thread_running:
                             return
                         self.play_note(note, note_duration)
-                self.grid.draw_text("-")
                 time.sleep(2)
                 no+=1
     

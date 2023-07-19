@@ -9,13 +9,22 @@ import utime
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.8c-xiao"
-        self.board = "Seeed XIAO RP2040"
-        self.cpu_speed_range = {"slow":20,"turbo":133} # Mhz
-        self.system_led = machine.Pin(25,machine.Pin.OUT)
-
+        self.version = "0.8d"
+        
+        # ESP8266
+        self.version += "-esp8266"
+        self.board = "Espressif ESP8266EX"
+        self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
+        self.system_led = machine.Pin(2,machine.Pin.OUT)
+        
+        # XIAO 2040
+        #self.version += "-esp8266"
+        #self.board = "Seeed XIAO RP2040"
+        #self.cpu_speed_range = {"slow":40,"turbo":133} # Mhz
+        #self.system_led = machine.Pin(25,machine.Pin.OUT)
+        
         self.prompt = "\nsmol $: "
-        self.turbo = False
+        self.turbo = True
         self.thread_running = False
         self.protected_files = { "boot.py","main.py" }
         self.user_commands = {
@@ -42,8 +51,8 @@ class smolOS:
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
             "py <filename>": "runs user program",
-            "led <command>": "manipulating on-board LED. Commands: `on`, `off`.",
-            "exe <code>": "Running exec(code)."
+            "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
+            "exe <code>": "Running exec(code)"
         }
         self.ed_commands_manual = {
             "help": "this help",
@@ -62,7 +71,6 @@ class smolOS:
         self.cls()
         self.welcome()
         self.led("boot")
-        self.py("life")
         while True:
             user_input = input(self.prompt)
             parts = user_input.split()
@@ -83,7 +91,7 @@ class smolOS:
         print("          / ___/ __ `__ \/ __ \/ / / / /\__ \ ")
         print("         (__  ) / / / / / /_/ / / /_/ /___/ / ")
         print("        /____/_/ /_/ /_/\____/_/\____//____/  ")
-        print("--------------\033[1;5;7mXIAO-RP2040-EDiTiON\033[0;1;33;44m--------------\n\033[0m")
+        print("-------------\033[1;5;7mTINY-OS-FOR-TINY-COMPUTERS\033[0;1;33;44m------------\n\033[0m")
 
     def welcome(self):
         self.banner()
@@ -127,7 +135,7 @@ class smolOS:
         print("\t\033[0mFirmware:\033[1m",uos.uname().version)
         turbo_msg = "\033[0mIn power-saving, \033[1mslow mode\033[0m. Use `turbo` to boost speed."
         if self.turbo:
-            turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` again for slow mode."
+            turbo_msg = "\033[0mIn \033[1mturbo mode\033[0m. Use `turbo` for slow mode."
         print("\t\033[0mCPU Speed:\033[1m",machine.freq()*0.000001,"MHz",turbo_msg)
         print("\t\033[0mFree memory:\033[1m",gc.mem_free(),"bytes")
         print("\t\033[0mUsed space:\033[1m",uos.stat("/")[0],"bytes")
@@ -216,7 +224,7 @@ class smolOS:
                         print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
 
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            print("{}: {}".format(f"{line_num:03}",line.strip()))
+                            print(line_num,":",line.strip())
 
                     user_ed_input = input("\ned $: ")
 
