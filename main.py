@@ -33,7 +33,7 @@ class smolOS:
             "exe": self.exe
         }
         self.user_commands_manual = {
-            "ls": "list files",
+            "list": "list files",
             "show <filename>": "print filename content",
             "info <filename>": "information about a file",
             "remove <filename>": "remove a file (be careful!)",
