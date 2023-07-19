@@ -39,6 +39,7 @@ class ANSI():
         print("\033[45mMagenta\t\t\\033[45m")
         print("\033[46mCyan\t\t\\033[46m")
         print("\033[30m\033[47mWhite\t\t\\033[47m")
+        print("\033[0m")
 
     def reset_attributes(self):
         print("\033[0m")

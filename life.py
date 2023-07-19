@@ -9,12 +9,13 @@ import random
 
 class Life():
     def __init__(self):
+        self.world_width = 10
+        self.world_height = 5
+        self.delay = 0.05
         self.world = []
         self.temp  = []
-        self.world_width = 12
-        self.world_size = self.world_width*5
+        self.world_size = self.world_width*self.world_height
         self.period = 0
-        self.delay = 0.05
         for _ in range(self.world_size):
             self.world.append(0)
             self.temp.append(0)
@@ -88,9 +89,12 @@ class Life():
                 utime.sleep(self.delay)
                 self.period+=1
             else:
-                utime.sleep(1)
-                self.random_seed()
-                self.period=0
+                if input("Continue? [yes]/no >")=="no":
+                    return
+                else:
+                    utime.sleep(1)
+                    self.random_seed()
+                    self.period=0
                     
     def begin(self):
         self.simulate()
