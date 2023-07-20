@@ -9,7 +9,7 @@ import utime
 class smolOS:
     def __init__(self):
         self.name="smolOS"
-        self.version = "0.8d"
+        self.version = "0.8e"
         
         # ESP8266
         self.version += "-esp8266"
@@ -53,15 +53,6 @@ class smolOS:
             "py <filename>": "runs user program",
             "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
             "exe <code>": "Running exec(code)"
-        }
-        self.ed_commands_manual = {
-            "help": "this help",
-            ">": "next page",
-            "<": "previous page",
-            "10 <line of text>": "replacing 10-th line with a line of text",
-            "append <lines>": "append new line(s) at the end of a file, default 1",
-            "write or save": "write changes to a file (not implemented yet)",
-            "quit": "quit"
         }
 
         self.boot()
@@ -201,12 +192,23 @@ class smolOS:
             self.system_led.value(1)
             return
 
-    # smolEDitor
+    # edit
     # Minimum viable text editor
     def ed(self, filename=""):
-        self.page_size = 10
-        self.file_edited = False
-        print("Welcome to \033[7msmolEDitor\033[0m\nMinimum viable text editor for smol operating system")
+        page_size = 10
+        file_edited = False
+        edit_mode = True
+        show_help = False
+        ed_commands_manual = {
+            "help": "this help",
+            ">": "next page",
+            "<": "previous page",
+            "10 <line of text>": "replacing 10-th line with a line of text",
+            "append <lines>": "append new line(s) at the end of a file, default 1",
+            "write or save": "write changes to a file (not implemented yet)",
+            "quit": "quit"
+        }
+        print("Welcome to \033[7medit\033[0m program.\nMinimum viable text editor for smol operating system")
         try:
             with open(filename,'r+') as file:
                 if filename in self.protected_files:
@@ -217,22 +219,27 @@ class smolOS:
                 start_index = 0
 
                 while True:
-                    if start_index < line_count:
-                        end_index = min(start_index + self.page_size,line_count)
-                        print_lines = lines[start_index:end_index]
+                    if edit_mode:
+                        if start_index < line_count:
+                            end_index = min(start_index + page_size,line_count)
+                            print_lines = lines[start_index:end_index]
 
-                        print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
+                            print("\033[7m    File:",filename,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
 
-                        for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            print(line_num,":",line.strip())
+                            for line_num,line in enumerate(print_lines,start=start_index + 1):
+                                print(line_num,":",line.strip())
+                    else:
+                        if show_help:
+                            self.man(ed_commands_manual)
+                            print("Hit `return` (button or command) to go back to  editing.\n")                            
 
                     user_ed_input = input("\ned $: ")
 
                     if user_ed_input =="quit":
-                        if self.file_edited:
+                        if file_edited:
                             self.print_msg("file was edited, `save` it first or write `quit!`")
                         else:
-                            self.print_msg("smolEDitor closed")
+                            self.print_msg("edit closed")
                             break
 
                     if user_ed_input == "quit!":
@@ -240,21 +247,27 @@ class smolOS:
                         break
 
                     if user_ed_input == "help":
-                        self.man(self.ed_commands_manual)
-
+                        edit_mode = False
+                        show_help = True
+                        
+                    if user_ed_input in ("","return"):
+                        if not edit_mode:
+                            edit_mode = True
+                            show_help = False
+                            
                     if user_ed_input == "append":
                         line_count += 1
                         lines.append("")
 
                     if user_ed_input == ">":
-                        if start_index+self.page_size < line_count:
-                            start_index += self.page_size
+                        if start_index+page_size < line_count:
+                            start_index += page_size
                         else:
                             self.print_msg("There is no next page. This is the last page.")
 
                     if user_ed_input == "<":
-                        if start_index-self.page_size >= 0:
-                            start_index -= self.page_size
+                        if start_index-page_size >= 0:
+                            start_index -= page_size
                         else:
                             self.print_msg("Can not go back, it is a first page already.")
 
@@ -281,7 +294,7 @@ class smolOS:
                                     lines[line_number - 1] = new_content + "\n"
                                 else:
                                     self.print_err("Invalid line number")
-                        self.file_edited = True
+                        file_edited = True
 
         except OSError:
             if filename == "":
