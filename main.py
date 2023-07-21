@@ -12,20 +12,20 @@ class smolOS:
         self.version = "0.8e"
         
         # ESP8266
-        self.version += "-esp8266"
-        self.board = "Espressif ESP8266EX"
-        self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
-        self.system_led = machine.Pin(2,machine.Pin.OUT)
+        #self.version += "-esp8266"
+        #self.board = "Espressif ESP8266EX"
+        #self.cpu_speed_range = {"slow":80,"turbo":160} # Mhz
+        #self.system_led = machine.Pin(2,machine.Pin.OUT)
         
         # XIAO 2040
-        #self.version += "-esp8266"
-        #self.board = "Seeed XIAO RP2040"
-        #self.cpu_speed_range = {"slow":40,"turbo":133} # Mhz
-        #self.system_led = machine.Pin(25,machine.Pin.OUT)
+        self.version += "-xiao"
+        self.board = "Seeed XIAO RP2040"
+        self.cpu_speed_range = {"slow":40,"turbo":133} # Mhz
+        self.system_led = machine.Pin(25,machine.Pin.OUT)
         
         self.prompt = "\nsmol $: "
         self.turbo = True
-        self.thread_running = False
+        self.background_prog = ""
         self.protected_files = { "boot.py","main.py" }
         self.user_commands = {
             "help": self.help,
@@ -37,7 +37,8 @@ class smolOS:
             "turbo": self.toggle_turbo,
             "edit": self.ed,
             "info": self.info,
-            "py": self.py,
+            "run": self.run,
+            "stop": self.stop,
             "led": self.led,
             "exe": self.exe
         }
@@ -50,7 +51,8 @@ class smolOS:
             "clear": "clears the screen",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
-            "py <filename>": "runs user program",
+            "run <filename>": "runs user program",
+            "stop": "stops latest running program",            
             "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
             "exe <code>": "Running exec(code)"
         }
@@ -167,15 +169,23 @@ class smolOS:
             uos.remove(filename)
             self.print_msg("File '{}' removed successfully.".format(filename))
 
-    def py(self,filename=""):
+    def run(self,filename=""):
         if filename == "":
             self.print_err("Specify a file name to run (without .py).")
             return
-        exec(open(filename+".py").read())
+        try:
+        	exec("import "+filename)
+        	#exec(open(filename+".py").read())
+        except OSError:
+            self.print_err("Failed")
+        
+    def stop(self):
+        if not self.background_prog == "":
+        	exec(self.background_prog+"().stop()")
+        	self.background_prog = ""
 
     def exe(self,command):
         exec(command)
-
     def led(self,cmd="on"):
         if cmd in ("on",""):
             self.system_led.value(0)
