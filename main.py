@@ -1,3 +1,8 @@
+# smolOS
+# from smolos import smolOS
+# os=smolOS()
+
+# DEMO
 from buzzer import Buzz
 from pixel import neo_pixel
 from plasma import neo_plasma
