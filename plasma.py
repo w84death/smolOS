@@ -1,4 +1,5 @@
 # Plasma effect for Adafruit NeoPixel BFF 5x5 LED Grid
+import machine
 import utime
 import _thread
 import time
@@ -57,5 +58,4 @@ class neo_plasma():
         else:
             print("NeoPixel: Thread already used. Use plasma.stop()")
 
-plasma = neo_plasma()
-plasma.demo()
+#plasma = neo_plasma()

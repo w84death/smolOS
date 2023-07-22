@@ -2,8 +2,8 @@ from machine import Pin, PWM
 import time
 import _thread
 
-class smolBuzzer():
-    def __init__(self):
+class Buzz():
+    def __init__(self,pin=3):
         self.thread_running = False
         self.notes = {
             'C': 261,
@@ -15,7 +15,7 @@ class smolBuzzer():
             'B': 494
         }
 
-        self.buzzer = PWM(Pin(3, Pin.OUT))
+        self.buzzer = PWM(Pin(pin, Pin.OUT))
         self.play_note('C',0.2)
         print("smolBuzzer: buzz.play_note('A',0.2), buzz.play_demo(), buzz.stop().")
         
@@ -71,19 +71,25 @@ class smolBuzzer():
                 time.sleep(2)
                 no+=1
     
-    def play_demo(self):
-        if not self.thread_running:
-            self.thread_running = True
-            _thread.start_new_thread(self.demo_thread,())
-            print("smoBuzzer: Playing demo track...")
+    def start_fg(self):        
+        self.thread_running = True
+        self.demo_thread()
+
+    def start(self, threaded=True):
+        if threaded:
+            if not self.thread_running:
+                self.thread_running = True
+                _thread.start_new_thread(self.demo_thread,())
+                print("smoBuzzer: Playing demo track...")
+            else:
+                print("smoBuzzer: Thread already in use. Kill other backround programs.")
         else:
-            print("smoBuzzer: Thread already in use. Kill other backround programs.")
+            self.thread_running = True
+            self.demo_thread()
             
     def stop(self):
         self.thread_running = False
         time.sleep(0.1) 
         self.buzzer.duty_u16(0)
-        
 
-buzz = smolBuzzer()
-buzz.play_demo()
+#buzz  = Buzz()
