@@ -7,55 +7,87 @@ import time
 import math
 import random
 
-class Life():
+# Define constants
+WORLD_WIDTH = 5
+WORLD_HEIGHT = 5
+DELAY = 0.05
+
+class Life:
+    """
+    A class to handle the Life functionalities.
+    """
     def __init__(self):
-        self.world_width = 10
-        self.world_height = 5
-        self.delay = 0.05
+        """
+        Initialize the Life object.
+        """
+        self.world_width = WORLD_WIDTH
+        self.world_height = WORLD_HEIGHT
+        self.delay = DELAY
         self.world = []
         self.temp  = []
         self.world_size = self.world_width*self.world_height
         self.period = 0
+        self.initialize_world()
+
+    def initialize_world(self):
+        """
+        Initialize the world with zero cells.
+        """
         for _ in range(self.world_size):
             self.world.append(0)
             self.temp.append(0)
 
     def random_seed(self):
+        """
+        Randomly seed the world.
+        """
         for i in range(self.world_size):
             self.world[i] = random.getrandbits(1)
-            
+
     def update_world(self):
+        """
+        Update the world with the temporary world.
+        """
         for i in range(self.world_size):
             self.world[i] = self.temp[i]
 
     def get_cell_value(self,i):
+        """
+        Get the cell value.
+        """
         if i<0 or i>=len(self.world):
             return 0
         return self.world[i]
-    
+
     def check_world(self):
+        """
+        Check the world for the next generation.
+        """
         i=0
         off=self.world_width
         stable = True
-        
+
         for cell in self.world:
             # Check eight closest cells
             density=0
-            density += self.get_cell_value(i-1)
-            density += self.get_cell_value(i+1)
+            if self.world_size%i>0:
+                density += self.get_cell_value(i-1)
+            if self.world_size%i<self.world_width-:
+                density += self.get_cell_value(i+1)
             density += self.get_cell_value(i-off+1)
             density += self.get_cell_value(i-off)
             density += self.get_cell_value(i-off-1)
+            
             density += self.get_cell_value(i+off+1)
             density += self.get_cell_value(i+off)
             density += self.get_cell_value(i+off-1)
-            
+
             # The rules of life..
             if cell == 1: # Cell is alive
                 if density<2 or density>3: # In overcrouded or to lonely conditions life is no more
                     self.temp[i] = 0
                     stable=False
-                else: # In bood conditions life is going forward
+                else: # In good conditions life is going forward
                     self.temp[i] = 1
             if cell == 0: # Cell is empty
                 if density==3: # In good conditions new life is born
@@ -65,9 +97,12 @@ class Life():
                     self.temp[i]=0 
             i+=1
         return not stable
-    
+
     def draw_world(self):
-        print("\033[2J")
+        """
+        Draw the world.
+        """
+        print("\\033[2J")
         line = ""
         for cell in range(len(self.world)):
             if self.world[cell] == 1:
@@ -78,8 +113,11 @@ class Life():
                 print(line)
                 line=""
         print("Period:",self.period)
-    
+
     def simulate(self):
+        """
+        Simulate the Life.
+        """
         self.random_seed()
         self.draw_world()
         while True:
@@ -95,9 +133,13 @@ class Life():
                     utime.sleep(1)
                     self.random_seed()
                     self.period=0
-                    
+
     def begin(self):
+        """
+        Begin the simulation.
+        """
         self.simulate()
 
-life = Life()
-life.begin()
+# To use this refactored code, you would do something like the following:
+# life = Life()
+# life.begin()
