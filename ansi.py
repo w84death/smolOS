@@ -1,53 +1,69 @@
-class ANSI():
+class ANSI:
+    """
+    A class to handle the ANSI escape sequences, text attributes, and colors.
+    """
     def __init__(self):
-        return
+        """
+        Initialize the ANSI object.
+        """
+        self.text_attributes = {
+            "Bold": "\\033[1m",
+            "Faint": "\\033[2m",
+            "Underline": "\\033[4m",
+            "Blink": "\\033[5m",
+            "Reverse video": "\\033[7m",
+            "Conceal": "\\033[8m",
+            "Crossed-out": "\\033[9m",
+        }
 
-    def header(self):
-        print("\n\033[1mANSI Escape Sequences\n")
-        print("\033[0mReset all attributes\t\\033[0m\n")
+        self.text_colors = {
+            "Black": "\\033[30m",
+            "Red": "\\033[31m",
+            "Green": "\\033[32m",
+            "Yellow": "\\033[33m",
+            "Blue": "\\033[34m",
+            "Magenta": "\\033[35m",
+            "Cyan": "\\033[36m",
+            "White": "\\033[37m",
+        }
 
-    def list_text_attributes(self):
-        print("\033[1mText Attributes\n")
-        print("\033[0m\033[1mBold\t\t\\033[1m")
-        print("\033[0m\033[2mFaint\t\t\\033[2m")
-        print("\033[0m\033[4mUnderline\t\\033[4m")
-        print("\033[0m\033[5mBlink\t\t\\033[5m")
-        print("\033[0m\033[7mReverse video\t\\033[7m")
-        print("\033[0m\033[8mConceal\t\t\\033[8m")
-        print("\033[0m\033[9mCrossed-out\t\\033[9m")
-        print("\n")
+        self.background_colors = {
+            "Black": "\\033[40m",
+            "Red": "\\033[41m",
+            "Green": "\\033[42m",
+            "Yellow": "\\033[43m",
+            "Blue": "\\033[44m",
+            "Magenta": "\\033[45m",
+            "Cyan": "\\033[46m",
+            "White": "\\033[47m",
+        }
 
-    def list_colors(self):
-        print("\033[0;1mText Colors\n")
-        print("\033[30mBlack\t\t\\033[30m")
-        print("\033[31mRed\t\t\\033[31m")
-        print("\033[32mGreen\t\t\\033[32m")
-        print("\033[33mYellow\t\t\\033[33m")
-        print("\033[34mBlue\t\t\\033[34m")
-        print("\033[35mMagenta\t\t\\033[35m")
-        print("\033[36mCyan\t\t\\033[36m")
-        print("\033[37mWhite\t\t\\033[37m")
-        print("\n")
-
-    def list_back_colors(self):
-        print("\033[0;1mBackground Colors\n")
-        print("\033[37m\033[40mBlack\t\t\\033[40m")
-        print("\033[41mRed\t\t\\033[41m")
-        print("\033[42mGreen\t\t\\033[42m")
-        print("\033[43mYellow\t\t\\033[43m")
-        print("\033[44mBlue\t\t\\033[44m")
-        print("\033[45mMagenta\t\t\\033[45m")
-        print("\033[46mCyan\t\t\\033[46m")
-        print("\033[30m\033[47mWhite\t\t\\033[47m")
-        print("\033[0m")
+    def list_sequences(self, title, sequences):
+        """
+        List a set of sequences with a title.
+        """
+        print(f"\\033[0;1m{title}\\n")
+        for name, code in sequences.items():
+            print(f"\\033[37m{code}{name}\\t\\t{code}")
+        print("\\n")
 
     def reset_attributes(self):
-        print("\033[0m")
+        """
+        Reset all attributes.
+        """
+        print("\\033[0m")
 
+
+# To use this refactored code, you would do something like the following:
 ansi = ANSI()
-ansi.header()
-ansi.list_text_attributes()
-ansi.reset_attributes()
-ansi.list_colors()
-ansi.list_back_colors()
 
+print("\\n\\033[1mANSI Escape Sequences\\n")
+print("\\033[0mReset all attributes\\t\\\\033[0m\\n")
+
+ansi.list_sequences("Text Attributes", ansi.text_attributes)
+ansi.reset_attributes()
+
+ansi.list_sequences("Text Colors", ansi.text_colors)
+
+ansi.list_sequences("Background Colors", ansi.background_colors)
+ansi.reset_attributes()
