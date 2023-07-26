@@ -214,6 +214,6 @@ class neo_grid():
         else:
             print("NeoPixel: Thread already used. Use grid.stop()")
 
-grid = neo_grid()
-grid.demo()
+#grid = neo_grid()
+#grid.demo()
 
