@@ -1,20 +1,12 @@
-# smolOS
-# from smolos import smolOS
-# os=smolOS()
+"""
+smolOS - boot script
+-------------------------------------------------
+Specialized Microcontroller-Oriented Lightweight Operating System
 
-# DEMO
-from buzzer import Buzz
-from pixel import neo_pixel
-from plasma import neo_plasma
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
 
-plasma = neo_plasma()
-plasma.demo()
-
-pixel0 = neo_pixel(12)
-pixel0.color((255,64,64))
-
-pixel1 = neo_pixel(3)
-pixel1.color((255,64,64))
-
-buzz=Buzz(4)
-buzz.start(False)
+from smolos import smolOS
+os=smolOS()
+os.boot()

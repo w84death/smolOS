@@ -1,6 +1,9 @@
-# Game of Life implementation for smolOS (serial)
-# Port by Krzysztof Krystian Jankowski
-# (c)2023.07
+"""
+Game of Life implementation for smolOS (serial)
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
 
 import utime
 import time

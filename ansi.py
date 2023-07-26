@@ -1,3 +1,10 @@
+"""
+Template for user programs for smolOS
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
+
 class ANSI:
     """
     A class to handle the ANSI escape sequences, text attributes, and colors.

@@ -1,8 +1,10 @@
 """
 smolOS - tiny operating system for tiny computers
 -------------------------------------------------
-by Krzysztof Krystian Jankowski
-Homepage: http://smol.p1x.in/os/
+Specialized Microcontroller-Oriented Lightweight Operating System
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
 """
 
 import machine
@@ -294,5 +296,3 @@ class smolOS:
 # To use this refactored code, you would do something like the following:
 # os = smolOS()
 # os.boot()
-
-

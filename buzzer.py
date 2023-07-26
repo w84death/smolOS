@@ -1,3 +1,10 @@
+"""
+Simple synthezator for 1-bit music
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
+
 from machine import Pin, PWM
 import time
 import _thread

@@ -1,6 +1,10 @@
 """
 Yellow Rubber Duck for programmers
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
 """
+
 import utime
 import _thread
 import time

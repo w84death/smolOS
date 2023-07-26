@@ -42,8 +42,8 @@ Just put main system file (smolos.py) onto the board flash (that has latest Micr
 * keep ```smolos.py``` name for manual booting
 
 ### Detailed Guides
-* [XIAO RP2040 Guide](XIAO-RP2040.md)
-* [ESP8266 Guide](ESP8266.md)
+* [XIAO RP2040 Guide](docs/XIAO-RP2040.md)
+* [ESP8266 Guide](docs/ESP8266.md)
 
 ## Connecting
 As normal user:
@@ -77,6 +77,14 @@ In MicroPython REPL write:
 ## Using
 
 Write `help` for manual :)
+
+## Missing Features
+Some kind of a roadmap.
+- move/copy files
+- saving in editor
+- code refactoring and tools unification
+- good manual
+
 
 ## Articles
 - [hackster.io](https://www.hackster.io/news/krzysztof-jankowski-s-micropython-based-smolos-puts-a-tiny-posix-like-environment-on-your-esp8266-0c776559152b)

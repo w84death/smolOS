@@ -1,7 +1,10 @@
 """
 Plasma effect for Adafruit NeoPixel BFF 5x5 LED Grid
+
 (c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
 """
+
 import machine
 import utime
 import _thread

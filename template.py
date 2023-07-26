@@ -1,5 +1,8 @@
 """
 Template for user programs for smolOS
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
 """
 
 import time
