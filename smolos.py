@@ -362,7 +362,7 @@ class smolOS:
                     if filename=="":
                         display_name = "NEW UNNAMED FILE"
 
-                    print("\033[7m    File:",display_name,"Lines:",line_count," // `h` help, `b` back,`n` next page\t\033[0m")
+                    print("\033[7m    File:",display_name,"Lines:",line_count," // `help`, `<` back,`>` next page, `quit`\t\033[0m")
 
                     for line_num,line in enumerate(print_lines,start=start_index + 1):
                         print(line_num,":",line.strip())

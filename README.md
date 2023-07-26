@@ -9,9 +9,10 @@ System should run on any MicroPython supproted board but it's tested and develop
 - [smolOS homepage (https)](https://smol.p1x.in/os/)
 
 ## Screens
-![smolOS version 0.8a-XIAO](media/smolos-08a.png)
-![smolOS commands version 0.8a-XIAO](media/commands-08a.png)
-![smolOS editor version 0.8a-XIAO](media/editor-08a.png)
+![smolOS XIAO](media/smolos.png)
+![smolOS list](media/list.png)
+![smolOS help](media/help.png)
+![smolOS editor](media/edit.png)
 
 ## Real Life Usecases
 
@@ -63,7 +64,7 @@ First start. Or after flashing new main.py file. Restart the microcontroller:
 ### Autoboot
 This should restart the device and "boot" you into the smolOS. Like so:
 
-![smolOS version 0.8a-XIAO](media/smolos-08a.png)
+![smolOS XIAO](media/smolos.png)
 
 ### Manual
 If you put ```smolos.py``` then you need to boot the system by hand.
