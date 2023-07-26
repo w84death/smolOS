@@ -462,5 +462,3 @@ class smolOS:
 End of system file.
 Homepage: https://smol.p1x.in/os/
 """
-os = smolOS()
-os.boot()
