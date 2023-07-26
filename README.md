@@ -34,9 +34,9 @@ System should run on any MicroPython supproted board but it's tested and develop
 ## Installation
 
 ### Super Quick Quide
-Just put main system file (smolos.py) onto the board flash (that has latest MicroPython firmware) and restart.
-* for auto boot rename the file to ```main.py``` it will auto start at each boot, or
-* keep ```smolos.py``` name for manual booting
+* put main system file ```smolos.py``` onto the board flash (that has latest MicroPython firmware)
+* (optional) for auto-boot copy ```main.py``` too
+* restart device
 
 ### Detailed Guides
 * [XIAO RP2040 Guide](docs/XIAO-RP2040.md)
