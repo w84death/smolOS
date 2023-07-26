@@ -8,11 +8,7 @@ System should run on any MicroPython supproted board but it's tested and develop
 - [smolOS homepage (http)](http://smol.p1x.in/os/)
 - [smolOS homepage (https)](https://smol.p1x.in/os/)
 
-## Screens
 ![smolOS XIAO](media/smolos.png)
-![smolOS list](media/list.png)
-![smolOS help](media/help.png)
-![smolOS editor](media/edit.png)
 
 ## Real Life Usecases
 
@@ -79,13 +75,16 @@ In MicroPython REPL write:
 
 Write `help` for manual :)
 
+![smolOS list](media/list.png)
+
+![smolOS help](media/help.png)
+
+![smolOS editor](media/edit.png)
+
 ## Missing Features
 Some kind of a roadmap.
 - move/copy files
-- saving in editor
-- code refactoring and tools unification
 - good manual
-
 
 ## Articles
 - [hackster.io](https://www.hackster.io/news/krzysztof-jankowski-s-micropython-based-smolos-puts-a-tiny-posix-like-environment-on-your-esp8266-0c776559152b)

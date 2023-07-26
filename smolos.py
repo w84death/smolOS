@@ -364,8 +364,10 @@ class smolOS:
 
                     print("\033[7m    File:",display_name,"Lines:",line_count," // `help`, `<` back,`>` next page, `quit`\t\033[0m")
 
+                    display_lines = ""
                     for line_num,line in enumerate(print_lines,start=start_index + 1):
-                        print(line_num,":",line.strip())
+                        display_lines += str(line_num)+": "+line
+                    print(display_lines)
             else:
                 if show_help:
                     self.man(ed_commands_manual)
