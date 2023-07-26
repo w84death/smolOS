@@ -93,6 +93,5 @@ class NeoPlasma:
         else:
             print("NeoPixel: Thread already used. Use plasma.stop()")
 
-# To use this refactored code, you would do something like the following:
 # plasma = NeoPlasma()
 # plasma.demo()

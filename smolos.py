@@ -293,6 +293,5 @@ class smolOS:
         """
         self.print_err("Unknown function. Type 'help' for list of functions.")
 
-# To use this refactored code, you would do something like the following:
 # os = smolOS()
 # os.boot()

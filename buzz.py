@@ -114,9 +114,7 @@ class Buzz:
         time.sleep(0.1) 
         self.buzzer.duty_u16(0)
 
-# To use this refactored code, you would do something like the following:
 # buzz = Buzz()
 # buzz.start_threaded()  # to start the demo in a new thread
-# or
 # buzz.start_unthreaded()  # to start the demo in the current thread
 # buzz.stop() to stop the demo

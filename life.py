@@ -143,6 +143,5 @@ class Life:
         """
         self.simulate()
 
-# To use this refactored code, you would do something like the following:
 # life = Life()
 # life.begin()

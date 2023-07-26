@@ -10,7 +10,7 @@ import neopixel
 import _thread
 import utime
 
-class NeoPixel:
+class Pixel:
     """
     A class to handle a single NeoPixel LED.
     """
@@ -91,24 +91,10 @@ class NeoPixel:
                 utime.sleep(self.BREATHE_DELAY)
 
 
-"""
-# How to use the NeoPixel class:
-
-1. Initialize a NeoPixel object:
-   pixel = NeoPixel(pin=12)  # replace 'pin' with the number of the pin that the NeoPixel is connected to
-
-2. Set the color of the NeoPixel:
-   pixel.color((255, 0, 0))  # set the color to red
-   pixel.color((0, 255, 0))  # set the color to green
-   pixel.color((0, 0, 255))  # set the color to blue
-
-3. Start an animation:
-   pixel.start_threaded()  # start the 'breath' animation in a new thread
-   or
-   pixel.start_unthreaded()  # start the 'heartbeat' animation in the current thread
-
-4. Stop the animation:
-   pixel.stop()
-
-Remember that the colors are specified as (R, G, B) tuples, where R, G, and B are integers from 0 to 255.
-"""
+# pixel = Pixel(pin=12)  # replace 'pin' with the number of the pin that the NeoPixel is connected to
+# pixel.color((255, 0, 0))  # set the color to red
+# pixel.color((0, 255, 0))  # set the color to green
+# pixel.color((0, 0, 255))  # set the color to blue
+# pixel.start_threaded()  # start the 'breath' animation in a new thread
+# pixel.start_unthreaded()  # start the 'heartbeat' animation in the current thread
+# pixel.stop()

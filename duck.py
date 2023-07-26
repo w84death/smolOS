@@ -157,10 +157,8 @@ class Duck:
         self.pixels.fill((0,0,0))
         self.pixels.write()
 
-# To use this refactored code, you would do something like the following:
 # duck = Duck()
 # duck.start_unthreaded()  # to start the duck animation in the current thread
-# or
 # duck.start_threaded()  # to start the duck animation in a new thread
 # duck.stop()  # to stop the duck animation
 

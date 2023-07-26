@@ -65,8 +65,6 @@ class Template:
         self.thread_running = True
         self.loop()
 
-# To use this refactored code, you would do something like the following:
 # template = Template()
 # template.start_threaded()  # to start in a new thread
-# or
 # template.start_unthreaded()  # to run in the current thread

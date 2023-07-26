@@ -60,17 +60,20 @@ class ANSI:
         """
         print("\\033[0m")
 
+    def show_all(self):
+        """
+        Shows all available attributes.
+        """
+        print("\\n\\033[1mANSI Escape Sequences\\n")
+        print("\\033[0mReset all attributes\\t\\\\033[0m\\n")
 
-# To use this refactored code, you would do something like the following:
-ansi = ANSI()
+        self.list_sequences("Text Attributes", self.text_attributes)
+        self.reset_attributes()
 
-print("\\n\\033[1mANSI Escape Sequences\\n")
-print("\\033[0mReset all attributes\\t\\\\033[0m\\n")
+        self.list_sequences("Text Colors", self.text_colors)
 
-ansi.list_sequences("Text Attributes", ansi.text_attributes)
-ansi.reset_attributes()
+        self.list_sequences("Background Colors", self.background_colors)
+        self.reset_attributes()
 
-ansi.list_sequences("Text Colors", ansi.text_colors)
-
-ansi.list_sequences("Background Colors", ansi.background_colors)
-ansi.reset_attributes()
+# ansi = ANSI()
+# ansi.show_all()
