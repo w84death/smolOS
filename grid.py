@@ -1,3 +1,5 @@
+# This code will be moved to scroller
+# Lot of refactoring here
 # App for controlling Adafruit NeoPixel BFF 5x5 LED Grid
 import utime
 import _thread

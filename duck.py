@@ -1,4 +1,10 @@
-# Yellow Rubber Duck for programmers
+"""
+Yellow Rubber Duck for programmers
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
+
 import utime
 import _thread
 import time
@@ -6,10 +12,15 @@ import neopixel
 import math
 import random
 
-class Duck():
+class Duck:
+    """
+    A class to handle the Duck functionalities.
+    """
     def __init__(self):
+        """
+        Initialize the Duck object.
+        """
         self.thread_running = False
-
         self.pixels = np = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((0,0,0))
         self.pixels.write()
@@ -17,134 +28,137 @@ class Duck():
         self.palette = [
             (0,0,0),
             (50,50,25),
-            (0,0,0),
-            (0,0,0),
-            (0,0,0),
             (10,10,10),
             (128,50,20),
-            (0,12,10)]
-
-        self.buddy0_bitmap = [
-            7,7,7,7,7,
-            7,7,7,7,7,
-            7,7,7,7,7,
-            7,7,7,7,7,
-            7,7,7,7,7,
-        ]
-        self.buddy1_bitmap = [
-            7,7,7,7,7,
-            7,7,7,7,7,
-            7,7,7,1,7,
-            7,7,7,5,7,
-            7,7,7,7,7,
-        ]
-        self.buddy2_bitmap = [
-            7,7,7,7,7,
-            7,7,7,7,7,
-            7,7,0,1,7,
-            7,7,5,5,7,
-            7,7,7,7,7,
-        ]
-        self.buddy3_bitmap = [
-            7,7,7,7,7,
-            7,1,0,1,7,
-            7,1,1,6,7,
-            7,1,0,1,7,
-            7,7,7,7,7,
-        ]
-        self.buddy4_bitmap = [
-            1,0,1,1,5,
-            1,1,6,1,1,
-            1,0,1,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-        self.buddy5_bitmap = [
-            1,5,1,1,5,
-            1,1,6,1,1,
-            1,5,1,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-        self.buddy6_bitmap = [
-            7,1,6,1,5,
-            1,0,1,1,1,
-            1,1,1,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-        self.buddy7_bitmap = [
-            1,1,1,1,5,
-            1,0,1,1,1,
-            7,1,6,1,1,
-            7,7,7,1,5,
-            7,7,7,5,7,
-        ]
-        self.buddy8_bitmap = [
-            7,1,0,1,5,
-            7,1,1,6,1,
-            7,1,0,1,1,
-            7,7,5,1,5,
-            7,7,1,7,7,
+            (0,12,10)
         ]
 
+        # Define animation frames
+        self.animations = {
+            "buddy": [
+                [
+                    4,4,4,4,4,
+                    4,4,4,4,4,
+                    4,4,4,4,4,
+                    4,4,4,4,4,
+                    4,4,4,4,4,
+                ],
+                [
+                    4,4,4,4,4,
+                    4,4,4,4,4,
+                    4,4,4,1,4,
+                    4,4,4,2,4,
+                    4,4,4,4,4,
+                ],
+                [
+                    4,4,4,4,4,
+                    4,4,4,4,4,
+                    4,4,0,1,4,
+                    4,4,2,2,4,
+                    4,4,4,4,4,
+                ],
+                [
+                    4,4,4,4,4,
+                    4,1,0,1,4,
+                    4,1,1,3,4,
+                    4,1,0,1,4,
+                    4,4,4,4,4,
+                ],
+                [
+                    1,0,1,1,2,
+                    1,1,3,1,1,
+                    1,0,1,1,1,
+                    4,4,4,1,2,
+                    4,4,4,2,4,
+                ],
+                [
+                    1,2,1,1,2,
+                    1,1,3,1,1,
+                    1,2,1,1,1,
+                    4,4,4,1,2,
+                    4,4,4,2,4,
+                ],
+                [
+                    4,1,3,1,2,
+                    1,0,1,1,1,
+                    1,1,1,1,1,
+                    4,4,4,1,2,
+                    4,4,4,2,4,
+                ],
+                [
+                    1,1,1,1,2,
+                    1,0,1,1,1,
+                    4,1,3,1,1,
+                    4,4,4,1,2,
+                    4,4,4,2,4,
+                ],
+                [
+                    4,1,0,1,2,
+                    4,1,1,3,1,
+                    4,1,0,1,1,
+                    4,4,2,1,2,
+                    4,4,1,4,4,
+                ],
+            ]
+        }
 
     def draw(self,bitmap):
+        """
+        Draw a specific frame.
+        """
         for i in range(25):
             self.pixels[24-i]=self.palette[bitmap[i]]
         self.pixels.write()
 
     def duck_thread(self):
-        anim_intro = [
-            self.buddy0_bitmap,
-            self.buddy0_bitmap,
-            self.buddy1_bitmap,
-            self.buddy0_bitmap,
-            self.buddy1_bitmap,
-            self.buddy2_bitmap,
-            self.buddy3_bitmap,
-            self.buddy4_bitmap,
-        ]
+        """
+        Play a duck animation in a new thread.
+        """
+        anim_intro = self.animations["buddy"][:4]
         for frame in anim_intro:
             self.draw(frame)
             utime.sleep(1)
 
-        anim = [
-            self.buddy4_bitmap,
-            self.buddy5_bitmap,
-            self.buddy6_bitmap,
-            self.buddy7_bitmap,
-            self.buddy8_bitmap,
-        ]
+        anim = self.animations["buddy"][4:]
         while self.thread_running:
             frame = random.choice(anim)
             self.draw(frame)
             utime.sleep(random.uniform(0.25, 2.0))
 
-    def bye(self):
-        anim_outro = [
-            self.buddy5_bitmap,
-            self.buddy3_bitmap,
-            self.buddy2_bitmap,
-            self.buddy1_bitmap,
-            self.buddy0_bitmap,
-        ]
-        self.thread_running = False
-        print("Duck swimps away...")
-        for frame in anim_outro:
-            self.draw(frame)
-            utime.sleep(1)
-        print("Use duck.hello()")
-        self.pixels.fill((0,0,0))
-        self.pixels.write()
+    def start_unthreaded(self):
+        """
+        Start the duck animation in the current thread.
+        """
+        if not self.thread_running:
+            self.thread_running = True
+            self.duck_thread()
+            print("Duck swims to you!\nExplain your problem now.")
 
-    def hello(self):
+    def start_threaded(self):
+        """
+        Start the duck animation in a new thread.
+        """
         if not self.thread_running:
             self.thread_running = True
             _thread.start_new_thread(self.duck_thread,())
-            print("Duck swims to you!.\nExplain your problem now.\nUse duck.bye() to stop.")
-        else:
-            print("Duck: Thread already in use. Kill other backround programs.")
+            print("Duck swims to you!\nExplain your problem now.")
 
-duck  = Duck()
-duck.hello()
+    def stop(self):
+        """
+        Stop the duck animation.
+        """
+        anim_outro = self.animations["buddy"][4:][::-1]
+        self.thread_running = False
+        print("Duck swims away...")
+        for frame in anim_outro:
+            self.draw(frame)
+            utime.sleep(1)
+        print("Use start_unthreaded() or start_threaded() to start.")
+        self.pixels.fill((0,0,0))
+        self.pixels.write()
+
+# duck = Duck()
+# duck.start_unthreaded()  # to start the duck animation in the current thread
+# duck.start_threaded()  # to start the duck animation in a new thread
+# duck.stop()  # to stop the duck animation
+

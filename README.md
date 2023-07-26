@@ -1,109 +1,96 @@
 # smolOS
+## Specialized Microcontroller-Oriented Lightweight Operating System
 
-smolOS - a tiny and simple operating system for MicroPython (targetting ESP8266 and RP2040) giving the user POSIX-like environment to play.
+smolOS is a tiny and simple operating system for MicroPython giving the user POSIX-like environment to play and research. It came with a set of tools and demos.
+System should run on any MicroPython supproted board but it's tested and developed for XIAO RP2040,
 
-
-![smolOS version 0.8a-XIAO](media/smolos-08a.png)
-![smolOS commands version 0.8a-XIAO](media/commands-08a.png)
-![smolOS editor version 0.8a-XIAO](media/editor-08a.png)
-
-Latest documentation available at official homepage:
+## Latest documentation available at official homepage:
 - [smolOS homepage (http)](http://smol.p1x.in/os/)
 - [smolOS homepage (https)](https://smol.p1x.in/os/)
+
+![smolOS XIAO](media/smolos.png)
 
 ## Real Life Usecases
 
 * listing and removing unwanted files on board
 * checking free space
 * quicly iterating parameters for a program
-* (planned) easy expanding OS with own functions coding on the board
-* learning basics of operating disk operating system (using and modyfing)
+* learning basics of disk operating system
+* having fun with microcontrollers
 
 ## smolOS Features
 
 * Changes microcontroller into a small working PC
 * Homemade for fun and learning
 * Super small and fast
-* Easy to use, simillar to MS-DOS, POSIX-like environment
+* Easy to use, simillar to MS-DOS, POSIX-like environments
 * List and manipulates files
 * Text editor included (very basic)
-* Ability to expand OS functionality with user defined code
-* Build on MicroPython
+* Basic tools and demos included (for NeoPixels, Buzzers, LEDs)
+* Build on MicroPython with clear code
 * Stability and simplicity are the main principle behind the code
-* Free :)
+* Free and open :)
 
 ## Installation
 
 ### Super Quick Quide
-Just put ```main.py``` into the board (that has latest MicroPython firmware) and restart.
+* put main system file ```smolos.py``` onto the board flash (that has latest MicroPython firmware)
+* (optional) for auto-boot copy ```main.py``` too
+* restart device
 
 ### Detailed Guides
-* [ESP8266 Guide](ESP8266.md)
-* [XIAO RP2040 Guide](XIAO-RP2040.md)
+* [XIAO RP2040 Guide](docs/XIAO-RP2040.md)
+* [ESP8266 Guide](docs/ESP8266.md)
 
 ## Connecting
 As normal user:
 
 ```
-$ picocom /dev/ttyUSB0 -b115200
+$ picocom /dev/ttyACM0
 ```
 Press ```ctrl+a+x``` to exit.
 
 ## Running
-
 
 First start. Or after flashing new main.py file. Restart the microcontroller:
 ```
 >>> machine.soft_reset()
 ```
 
+### Autoboot
 This should restart the device and "boot" you into the smolOS. Like so:
 
+![smolOS XIAO](media/smolos.png)
+
+### Manual
+If you put ```smolos.py``` then you need to boot the system by hand.
+In MicroPython REPL write:
 ```
-
-
-
-______________________________________________
-                                 ______  _____
-           _________ ___  ____  / / __ \/ ___/
-          / ___/ __ `__ \/ __ \/ / / / /\__ \
-         (__  ) / / / / / /_/ / / /_/ /___/ /
- _[..]  /____/_/ /_/ /_/\____/_/\____//____/
-==============================================
-
-       smolOS Version 0.3
-       MicroPython: 2.2.0-dev(9422289)
-       Firmware: v1.20.0 on 2023-04-26
-       CPU Speed: 80.0 MHz
-
-
-
-
-smolInfo: Type [help] for smol manual.
-
-
-
-
-smol $:
-```
-
-
-If you close the system or encurage a fatal error start OS again. In MicroPython REPL write:
-```
->>> smolOS()
-```
-
-Or restart device:
-```
->>> machine.soft_reset()
+>>> from smolos import smolOS
+>>> os = smolOS()
+>>> os.boot()
 ```
 
 ## Using
 
 Write `help` for manual :)
 
+![smolOS list](media/list.png)
+
+![smolOS help](media/help.png)
+
+![smolOS editor](media/edit.png)
+
+## Missing Features
+Some kind of a roadmap.
+- move/copy files
+- good manual
 
 ## Articles
 - [hackster.io](https://www.hackster.io/news/krzysztof-jankowski-s-micropython-based-smolos-puts-a-tiny-posix-like-environment-on-your-esp8266-0c776559152b)
 - [cnx-software.com](https://www.cnx-software.com/2023/07/12/smolos-brings-a-linux-like-command-line-interface-to-esp8266-microcontroller/)
 - [lobste.rs](https://lobste.rs/s/ipztxc/smolos_small_os_for_micropython_on)
+
+## Intresting forks
+- [pegasusOS by 047pegasus](https://github.com/047pegasus/pegasusOS)
+- [smolOS by rbenrax](https://github.com/rbenrax/smolOS)
