@@ -1,5 +1,5 @@
 # smolOS
-## Specialized Microcontroller Oriented Lightweight Operating System
+## Specialized Microcontroller-Oriented Lightweight Operating System
 
 smolOS is a tiny and simple operating system for MicroPython giving the user POSIX-like environment to play and research. It came with a set of tools and demos.
 System should run on any MicroPython supproted board but it's tested and developed for XIAO RP2040,
