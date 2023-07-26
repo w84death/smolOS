@@ -55,6 +55,16 @@ The whole system is in one file `smolos.py`. There are additional tools and demo
 - viewing a file
 - editing a file
 
+# Included Tools
+
+- ansi
+- life
+- buzz
+- pixel
+- scroller
+- plasma
+- duck
+
 # Running User Programs
 
 - idea
