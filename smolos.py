@@ -141,7 +141,16 @@ class smolOS:
         Print an error message.
         """
         print("\n\033[1;37;41m\t<!>", error, "<!>\t\033[0m")
-
+        
+    def ask_user(self, message):
+        """
+        Inputs user for an yes/no answer.
+        """
+        answer = input(message +" [yes]/no: ")
+        if answer in ("yes", ""):
+            return True
+        return False
+    
     def list(self):
         """
         List the files in the system.
@@ -297,6 +306,9 @@ class smolOS:
         self.print_err("Unknown function. Type 'help' for list of functions.")
 
     def try_exec_script(self,command):
+        """
+        Trys to execute a script of a same name as given command
+        """
         if command+'.py' in uos.listdir():
             self.run(command)
         else:
@@ -317,7 +329,7 @@ class smolOS:
             "10 <line of text>": "replacing 10-th line with a line of text",
             "append <lines>": "append new line(s) at the end of a file, default 1",
             "write or save": "write changes to a file",
-            "name <filename>": "gives name to open file",
+            "name <filename>": "gives new name to opened file",
             "new": "open new empty file",
             "quit": "quit editor"
         }
@@ -407,11 +419,8 @@ class smolOS:
                     if new_file:
                         ready = True
                     if filename in uos.listdir():
-                        answer = input("You are overwriting an existing file, are you sure? [yes]/no: ")
-                        if answer in ("yes", ""):
+                        if self.ask_user("You are overwriting an existing file, are you sure?"):
                             ready = True
-
-
                     if ready:
                         with open(filename, "w") as file:
                             for line in lines:
