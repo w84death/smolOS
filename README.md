@@ -4,13 +4,14 @@
 smolOS is a tiny and simple operating system for MicroPython giving the user POSIX-like environment to play and research. It came with a set of tools and demos.
 System should run on any MicroPython supproted board but it's tested and developed for XIAO RP2040,
 
+## Latest documentation available at official homepage:
+- [smolOS homepage (http)](http://smol.p1x.in/os/)
+- [smolOS homepage (https)](https://smol.p1x.in/os/)
+
+## Screens
 ![smolOS version 0.8a-XIAO](media/smolos-08a.png)
 ![smolOS commands version 0.8a-XIAO](media/commands-08a.png)
 ![smolOS editor version 0.8a-XIAO](media/editor-08a.png)
-
-Latest documentation available at official homepage:
-- [smolOS homepage (http)](http://smol.p1x.in/os/)
-- [smolOS homepage (https)](https://smol.p1x.in/os/)
 
 ## Real Life Usecases
 
@@ -62,24 +63,7 @@ First start. Or after flashing new main.py file. Restart the microcontroller:
 ### Autoboot
 This should restart the device and "boot" you into the smolOS. Like so:
 
-```
-______________________________________________
-                                 ______  _____
-           _________ ___  ____  / / __ \/ ___/
-          / ___/ __ `__ \/ __ \/ / / / /\__ \
-         (__  ) / / / / / /_/ / / /_/ /___/ /
- _[..]  /____/_/ /_/ /_/\____/_/\____//____/
-==============================================
-
-       smolOS Version 0.3
-       MicroPython: 2.2.0-dev(9422289)
-       Firmware: v1.20.0 on 2023-04-26
-       CPU Speed: 80.0 MHz
-
-smolInfo: Type [help] for smol manual.
-
-smol $:
-```
+![smolOS version 0.8a-XIAO](media/smolos-08a.png)
 
 ### Manual
 If you put ```smolos.py``` then you need to boot the system by hand.
