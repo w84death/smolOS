@@ -37,13 +37,13 @@ System should run on any MicroPython supproted board but it's tested and develop
 ## Installation
 
 ### Super Quick Quide
-Just put main file into the board (that has latest MicroPython firmware) and restart.
+Just put main system file (smolos.py) onto the board flash (that has latest MicroPython firmware) and restart.
 * for auto boot rename the file to ```main.py``` it will auto start at each boot, or
-* send ```smolos.py``` for manual booting
+* keep ```smolos.py``` name for manual booting
 
 ### Detailed Guides
-* [ESP8266 Guide](ESP8266.md)
 * [XIAO RP2040 Guide](XIAO-RP2040.md)
+* [ESP8266 Guide](ESP8266.md)
 
 ## Connecting
 As normal user:
