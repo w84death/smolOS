@@ -7,7 +7,6 @@ Homepage: https://smol.p1x.in/os/
 
 import machine
 import neopixel
-import _thread
 import utime
 
 class Pixel:
@@ -22,79 +21,66 @@ class Pixel:
         """
         Initialize the NeoPixel object.
         """
-        self.thread_running = False
+        self.name = "Pixel"
         self.power = machine.Pin(11, machine.Pin.OUT)
         self.power.value(1)
         self.pixel = neopixel.NeoPixel(machine.Pin(pin), 1)
-        print("NeoPixel: Initialized. Use pixel.start(), pixel.stop(), pixel.color('r,g,b').")
+        self.msg("Initialized.")
 
-    def color(self, color=(0, 0, 0)):
+
+    def msg(self, message):
+        """
+        Print a message from the program.
+        """
+        print(f"{self.name} : {message}")
+
+    def color(self, color=((0,0,0))):
         """
         Set the color of the NeoPixel.
         """
         self.pixel.fill(color)
         self.pixel.write()
-
-    def stop(self):
-        """
-        Stop the animation.
-        """
-        self.thread_running = False
-        print("NeoPixel: Hearthbeat stopped. Use pixel.start()")
-
-    def start_threaded(self):
-        """
-        Start the animation in a new thread.
-        """
-        if not self.thread_running:
-            self.thread_running = True
-            _thread.start_new_thread(self.breath, ())
-            print("NeoPixel: Hearthbeat started in background. Use pixel.stop()")
-
-    def start_unthreaded(self):
-        """
-        Start the animation in the current thread.
-        """
-        if not self.thread_running:
-            self.thread_running = True
-            self.heartbeat()
+        self.msg(f"Color set to: \n\t* Red {color[0]}\n\t* Green {color[1]}\n\t* Blue {color[2]}")
 
     def heartbeat(self):
         """
         Animate the NeoPixel with a "heartbeat" pattern.
         """
-        while self.thread_running:
-            for brightness in self.HEARTBEAT_PATTERN:
-                red = int((255 * brightness) / 255)
-                green = int((105 * brightness) / 255)
-                blue = int((180 * brightness) / 255)
-
-                self.pixel.fill((red, red, red))
-                self.pixel.write()
-                utime.sleep(self.HEARTBEAT_DELAY)
+        self.msg("Press Ctrl+C to quit.\n")
+        while True:
+            try:
+                for brightness in self.HEARTBEAT_PATTERN:
+                    red = int((255 * brightness) / 255)
+                    green = int((105 * brightness) / 255)
+                    blue = int((180 * brightness) / 255)
+                    self.pixel.fill((red, red, red))
+                    self.pixel.write()
+                    utime.sleep(self.HEARTBEAT_DELAY)
+            except KeyboardInterrupt:
+                break
 
     def breath(self):
         """
         Animate the NeoPixel with a "breath" pattern.
         """
-        while self.thread_running:
-            for brightness in range(255):
-                white = int((255 * brightness) / 255)
-                self.pixel.fill((white, white, white))
-                self.pixel.write()
-                utime.sleep(self.BREATHE_DELAY)
-            utime.sleep(1)
-            for brightness in range(255):
-                white = 255 - int((255 * brightness) / 255)
-                self.pixel.fill((white, white, white))
-                self.pixel.write()
-                utime.sleep(self.BREATHE_DELAY)
+        self.msg("Press Ctrl+C to quit.\n")
+        while True:
+            try:
+                for brightness in range(255):
+                    white = int((255 * brightness) / 255)
+                    self.pixel.fill((white, white, white))
+                    self.pixel.write()
+                    utime.sleep(self.BREATHE_DELAY)
+                utime.sleep(1)
+                for brightness in range(255):
+                    white = 255 - int((255 * brightness) / 255)
+                    self.pixel.fill((white, white, white))
+                    self.pixel.write()
+                    utime.sleep(self.BREATHE_DELAY)
+            except KeyboardInterrupt:
+                break
 
+if __name__ == '__main__':
+    pixel = Pixel()
+    pixel.color((64, 64, 255))
 
-# pixel = Pixel(pin=12)  # replace 'pin' with the number of the pin that the NeoPixel is connected to
-# pixel.color((255, 0, 0))  # set the color to red
-# pixel.color((0, 255, 0))  # set the color to green
-# pixel.color((0, 0, 255))  # set the color to blue
-# pixel.start_threaded()  # start the 'breath' animation in a new thread
-# pixel.start_unthreaded()  # start the 'heartbeat' animation in the current thread
-# pixel.stop()

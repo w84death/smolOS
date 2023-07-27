@@ -39,7 +39,6 @@ class smolOS:
         self.system_led = machine.Pin(SYSTEM_LED_PIN, machine.Pin.OUT)
         self.prompt = "\nsmol $: "
         self.turbo = True
-        self.background_prog = ""
         self.protected_files = {"boot.py", "main.py"}
         self.user_commands = {
             "help": self.help,
@@ -51,8 +50,6 @@ class smolOS:
             "turbo": self.toggle_turbo,
             "edit": self.edit,
             "info": self.info,
-            "run": self.run,
-            "stop": self.stop,
             "led": self.led,
             "exe": self.exe
         }
@@ -65,10 +62,9 @@ class smolOS:
             "clear": "clears the screen",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
-            "run <filename>": "loads and runs user program (load first)",
-            "stop": "stops and unloads latest running program",
             "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
-            "exe <code>": "Running exec(code)"
+            "exe <code>": "Running exec(code)",
+            "<filename>": "runs user program (without .py)"
         }
         self.boot()
 
@@ -80,18 +76,21 @@ class smolOS:
         self.clear()
         self.welcome()
         while True:
-            user_input = input(self.prompt)
-            parts = user_input.split()
-            if len(parts) > 0:
-                command = parts[0]
-                if command in self.user_commands:
-                    if len(parts) > 1:
-                        arguments = parts[1:]
-                        self.user_commands[command](*arguments)
+            try:
+                user_input = input(self.prompt)
+                parts = user_input.split()
+                if len(parts) > 0:
+                    command = parts[0]
+                    if command in self.user_commands:
+                        if len(parts) > 1:
+                            arguments = parts[1:]
+                            self.user_commands[command](*arguments)
+                        else:
+                            self.user_commands[command]()
                     else:
-                        self.user_commands[command]()
-                else:
-                    self.try_exec_script(command)
+                        self.try_exec_script(command)
+            except KeyboardInterrupt:
+                break
 
     def banner(self):
         """
@@ -247,28 +246,6 @@ class smolOS:
         else:
             self.print_err("No filename provided.")
 
-    def run(self, filename=""):
-        """
-        Run a program in the system.
-        """
-        if filename:
-            try:
-                with open(filename+".py", "r") as file:
-                    code = file.read()
-                self.background_prog = filename
-                exec(code)
-            except OSError:
-                self.print_err("Cannot run program!")
-        else:
-            self.print_err("No filename provided.")
-
-    def stop(self):
-        """
-        Stop a running program in the system.
-        """
-        self.background_prog = ""
-        print("Background program stopped.")
-
     def led(self, command=""):
         """
         Control the system LED.
@@ -299,6 +276,17 @@ class smolOS:
         else:
             self.print_err("No code provided.")
 
+    def run(self, command):
+        """
+        Run a program in the system.
+        """
+        try:
+            with open(command+".py", "r") as file:
+                code = file.read()
+            exec(code)
+        except OSError:
+            self.print_err(f"Problem with running {command} program")
+
     def unknown_function(self):
         """
         Handle unknown function calls.
@@ -309,7 +297,7 @@ class smolOS:
         """
         Trys to execute a script of a same name as given command
         """
-        if command+'.py' in uos.listdir():
+        if f"{command}.py" in uos.listdir():
             self.run(command)
         else:
             self.unknown_function()
@@ -333,8 +321,8 @@ class smolOS:
             "new": "open new empty file",
             "quit": "quit editor"
         }
-        print("Welcome to \033[7medit\033[0m program.\nMinimum viable text editor for smol operating system")
-
+        print("Welcome to \033[7medit\033[0m program.\nMinimum viable text editor for smol operating system.")
+        print("\033[7mPress Ctrl+C to quit\033[0m.\n")
         try:
             if filename == "":
                 lines = [""]
@@ -352,113 +340,117 @@ class smolOS:
             self.print_err("Failed to open the file.")
             return
 
-
         while True:
-            if edit_mode:
-                if start_index < line_count:
-                    end_index = min(start_index + PAGE_SIZE,line_count)
-                    print_lines = lines[start_index:end_index]
-                    display_name = filename
-                    if filename=="":
-                        display_name = "NEW UNNAMED FILE"
+            try:
+                if edit_mode:
+                    if start_index < line_count:
+                        end_index = min(start_index + PAGE_SIZE,line_count)
+                        print_lines = lines[start_index:end_index]
+                        display_name = filename
+                        if filename=="":
+                            display_name = "NEW UNNAMED FILE"
 
-                    print("\033[7m    File:",display_name,"Lines:",line_count," // `help`, `<` back,`>` next page, `quit`\t\033[0m")
+                        print("\033[7m    File:",display_name,"Lines:",line_count," // Use `<` `>` for pagination \033[0m")
 
-                    display_lines = ""
-                    for line_num,line in enumerate(print_lines,start=start_index + 1):
-                        display_lines += str(line_num)+": "+line
-                    print(display_lines)
-            else:
-                if show_help:
-                    self.man(ed_commands_manual)
-                    print("\n\033[7mHit [return] button\033[0m (or command) to go back to  editing.\n")
-
-            user_ed_input = input("\ned $: ")
-
-            if user_ed_input =="quit":
-                if file_edited:
-                    self.print_msg("file was edited, `save` it first or write `quit!`")
+                        display_lines = ""
+                        for line_num,line in enumerate(print_lines,start=start_index + 1):
+                            display_lines += str(line_num)+": "+line
+                        print(display_lines)
                 else:
-                    self.print_msg("edit closed")
+                    if show_help:
+                        self.man(ed_commands_manual)
+                        print("\n\033[7mHit [return] button\033[0m (or command) to go back to  editing.\n")
+
+                user_ed_input = input("\ned $: ")
+
+                if user_ed_input =="quit":
+                    if file_edited:
+                        self.print_msg("file was edited, `save` it first or write `quit!`")
+                    else:
+                        self.print_msg("edit closed")
+                        break
+
+                if user_ed_input == "quit!":
+                    self.print_msg("smolEDitor closed")
                     break
 
-            if user_ed_input == "quit!":
-                self.print_msg("smolEDitor closed")
-                break
+                if user_ed_input == "help":
+                    edit_mode = False
+                    show_help = True
 
-            if user_ed_input == "help":
-                edit_mode = False
-                show_help = True
+                if user_ed_input in ("","return"):
+                    if not edit_mode:
+                        edit_mode = True
+                        show_help = False
 
-            if user_ed_input in ("","return"):
-                if not edit_mode:
-                    edit_mode = True
-                    show_help = False
+                if user_ed_input == "append":
+                    line_count += 1
+                    lines.append("")
 
-            if user_ed_input == "append":
-                line_count += 1
-                lines.append("")
+                if user_ed_input == ">":
+                    if start_index+PAGE_SIZE < line_count:
+                        start_index += PAGE_SIZE
+                    else:
+                        self.print_msg("There is no next page. This is the last page.")
 
-            if user_ed_input == ">":
-                if start_index+PAGE_SIZE < line_count:
-                    start_index += PAGE_SIZE
-                else:
-                    self.print_msg("There is no next page. This is the last page.")
+                if user_ed_input == "<":
+                    if start_index-PAGE_SIZE >= 0:
+                        start_index -= PAGE_SIZE
+                    else:
+                        self.print_msg("Can not go back, it is a first page already.")
 
-            if user_ed_input == "<":
-                if start_index-PAGE_SIZE >= 0:
-                    start_index -= PAGE_SIZE
-                else:
-                    self.print_msg("Can not go back, it is a first page already.")
-
-            if user_ed_input in ("save","write"):
-                if filename == "":
-                    self.print_err("Your new file has no name. Use `name` followed by a file name and save again.")
-                elif filename in self.protected_files:
-                    self.print_err("Protected file")
-                else:
-                    ready = False
-                    if new_file:
-                        ready = True
-                    if filename in uos.listdir():
-                        if self.ask_user("You are overwriting an existing file, are you sure?"):
-                            ready = True
-                    if ready:
-                        with open(filename, "w") as file:
-                            for line in lines:
-                                file.write(line)
-                        self.print_msg("Saved in "+ filename)
-                        file_edited = False
-                        new_file = False
-
-            if user_ed_input == "new":
-                lines = [""]
-                line_count = len(lines)
-                new_file = True
-                filename = ""
-                
-            parts = user_ed_input.split(" ",1)
-            if len(parts) == 2:
-                if parts[0] == "append":
-                    new_lines = int(parts[1])
-                    line_count += new_lines
-                    for _ in range(new_lines):
-                        lines.append("")
-                elif parts[0] == "name":
-                    if parts[1] in self.protected_files:
+                if user_ed_input in ("save","write"):
+                    if filename == "":
+                        self.print_err("Your new file has no name. Use `name` followed by a file name and save again.")
+                    elif filename in self.protected_files:
                         self.print_err("Protected file")
                     else:
-                        filename=parts[1]
-                else:
-                    line_number = int(parts[0])
-                    new_content = parts[1]
-                    if line_number > 0 and line_number <= line_count:
-                        lines[line_number - 1] = new_content + "\n"
-                    else:
-                        self.print_err("Invalid line number")
-                file_edited = True
+                        ready = False
+                        if new_file:
+                            ready = True
+                        if filename in uos.listdir():
+                            if self.ask_user("You are overwriting an existing file, are you sure?"):
+                                ready = True
+                        if ready:
+                            with open(filename, "w") as file:
+                                for line in lines:
+                                    file.write(line)
+                            self.print_msg("Saved in "+ filename)
+                            file_edited = False
+                            new_file = False
 
+                if user_ed_input == "new":
+                    lines = [""]
+                    line_count = len(lines)
+                    new_file = True
+                    filename = ""
+                    
+                parts = user_ed_input.split(" ",1)
+                if len(parts) == 2:
+                    if parts[0] == "append":
+                        new_lines = int(parts[1])
+                        line_count += new_lines
+                        for _ in range(new_lines):
+                            lines.append("")
+                    elif parts[0] == "name":
+                        if parts[1] in self.protected_files:
+                            self.print_err("Protected file")
+                        else:
+                            filename=parts[1]
+                    else:
+                        line_number = int(parts[0])
+                        new_content = parts[1]
+                        if line_number > 0 and line_number <= line_count:
+                            lines[line_number - 1] = new_content + "\n"
+                        else:
+                            self.print_err("Invalid line number")
+                    file_edited = True
+            except KeyboardInterrupt:
+                break
 """
 End of system file.
 Homepage: https://smol.p1x.in/os/
 """
+if __name__ == '__main__':
+    os = smolOS()
+    os.boot()

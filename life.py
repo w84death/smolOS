@@ -11,7 +11,7 @@ import math
 import random
 
 # Define constants
-WORLD_WIDTH = 5
+WORLD_WIDTH = 15
 WORLD_HEIGHT = 5
 DELAY = 0.05
 
@@ -73,9 +73,9 @@ class Life:
         for cell in self.world:
             # Check eight closest cells
             density=0
-            if self.world_size%i>0:
+            if i%self.world_size-1>0:
                 density += self.get_cell_value(i-1)
-            if self.world_size%i<self.world_width-:
+            if i%self.world_size-1<self.world_width:
                 density += self.get_cell_value(i+1)
             density += self.get_cell_value(i-off+1)
             density += self.get_cell_value(i-off)
@@ -105,8 +105,9 @@ class Life:
         """
         Draw the world.
         """
-        print("\\033[2J")
+        print("\033[2J")
         line = ""
+        
         for cell in range(len(self.world)):
             if self.world[cell] == 1:
                 line += "█"
@@ -121,27 +122,25 @@ class Life:
         """
         Simulate the Life.
         """
+        print("Press Ctrl+C to quit.\n")
         self.random_seed()
         self.draw_world()
+        
         while True:
-            if self.check_world():
-                self.update_world()
-                self.draw_world()
-                utime.sleep(self.delay)
-                self.period+=1
-            else:
-                if input("Continue? [yes]/no >")=="no":
-                    return
+            try:
+                if self.check_world():
+                    self.update_world()
+                    self.draw_world()
+                    utime.sleep(self.delay)
+                    self.period+=1
                 else:
                     utime.sleep(1)
                     self.random_seed()
                     self.period=0
+            except KeyboardInterrupt:
+                break
 
-    def begin(self):
-        """
-        Begin the simulation.
-        """
-        self.simulate()
+if __name__ == '__main__':
+    life = Life()
+    life.simulate()
 
-# life = Life()
-# life.begin()

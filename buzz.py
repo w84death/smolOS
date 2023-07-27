@@ -7,7 +7,6 @@ Homepage: https://smol.p1x.in/os/
 
 from machine import Pin, PWM
 import time
-import _thread
 
 # Define constants
 BUZZER_PIN = 3
@@ -32,7 +31,7 @@ class Buzz:
         """
         Initialize the Buzz object.
         """
-        self.thread_running = False
+        self.name = "Buzz"
         self.notes = {
             'C': 261,
             'D': 294,
@@ -44,7 +43,7 @@ class Buzz:
         }
         self.buzzer = PWM(Pin(BUZZER_PIN, Pin.OUT))
         self.play_note('C', 0.2)
-        print("smolBuzzer: buzz.play_note('A',0.2), buzz.play_demo(), buzz.stop().")
+        self.msg("Initialized.")
         
     def play_note(self, note, duration):
         """
@@ -64,57 +63,45 @@ class Buzz:
         time.sleep(0.05)
         self.buzzer.duty_u16(0)
     
-    def demo_thread(self):
+    def demo(self):
         """
         Play a demo of songs in a new thread.
         """
-        while self.thread_running:
-            no=0
-            for song in SONGS:
-                if not self.thread_running:
-                    return
-                print("smoBuzzer: Track",no)
-                for prog in range(REPEAT):
-                    progress = "#"
-                    for _ in range(prog):
-                        progress += "#"
-                    for _ in range(REPEAT-prog-1):
-                        progress += "_"
-                    print("\t["+progress+"]")
-                    for note in song:
-                        if not self.thread_running:
-                            return
-                        self.play_note(note, NOTE_DURATION)
-                time.sleep(2)
-                no+=1
-    
-    def start_unthreaded(self):        
-        """
-        Start the demo in the current thread.
-        """
-        self.thread_running = True
-        self.demo_thread()
+        self.msg("Playing demo.\nPress Ctrl+C to stop.\n")
         
-    def start_threaded(self):
-        """
-        Start the demo in a new thread.
-        """
-        if not self.thread_running:
-            self.thread_running = True
-            _thread.start_new_thread(self.demo_thread,())
-            print("smoBuzzer: Playing demo track...")
-        else:
-            print("smoBuzzer: Thread already in use. Kill other backround programs.")
+        while True:
+            try:
+                no=0
+                for song in SONGS:
+                    self.msg(f"Track {no}")
+                    for prog in range(REPEAT):
+                        progress = "#"
+                        for _ in range(prog):
+                            progress += "#"
+                        for _ in range(REPEAT-prog-1):
+                            progress += "_"
+                        self.msg(f"\t[{progress}]")
+                        for note in song:
+                            self.play_note(note, NOTE_DURATION)
+                    time.sleep(2)
+                    no+=1
+            except KeyboardInterrupt:
+                self.stop()
+                break
             
     def stop(self):
         """
         Stop the demo.
         """
-        self.thread_running = False
         time.sleep(0.1) 
         self.buzzer.duty_u16(0)
 
-# buzz = Buzz()
-# buzz.start_threaded()  # to start the demo in a new thread
-# buzz.start_unthreaded()  # to start the demo in the current thread
-# buzz.stop() to stop the demo
+    def msg(self, message):
+        """
+        Print a message from the program.
+        """
+        print(f"{self.name} : {message}")
+
+if __name__ == '__main__':
+    buzz = Buzz()
+    buzz.demo()
