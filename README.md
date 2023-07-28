@@ -100,6 +100,8 @@ Write `help` for manual :)
 ## Missing Features
 Some kind of a roadmap.
 - move/copy files
+- finalized editor (mostly done; last edge-cases to cover)
+- finalized architecture/names (version 0.9 will show final vision)
 - good manual
 
 ## Articles
