@@ -27,7 +27,7 @@ OS_PROMPT = "\nsmol $: "
 OS_START_TURBO = True
 
 UI_PAGE_SIZE = 20
-
+UI_BOOT_LED_ROUNDS = 4
 
 class smolOS:
     """
@@ -250,7 +250,7 @@ class smolOS:
         if filename:
             try:
                 file_info = uos.stat(filename)
-                print("\t\033[4m", filename,"\033[0m", file_info[6], "bytes")
+                print(f"\t\033[4m{filename}\033[0m", file_info[6], "bytes")
                 if not short:
                     print("\tCreated:", utime.localtime(file_info[7]))
                     print("\tModified:", utime.localtime(file_info[8]))
@@ -268,7 +268,7 @@ class smolOS:
         elif command == "off":
             self.system_led.value(0)
         elif command=="boot":
-            for _ in range(4):
+            for _ in range(UI_BOOT_LED_ROUNDS):
                 self.system_led.value(0)
                 utime.sleep(0.1)
                 self.system_led.value(1)
@@ -294,17 +294,14 @@ class smolOS:
         Run a program in the system.
         """
         try:
-            #with open(command+".py", "r") as file:
-            #    code = file.read()
-            #exec(code)
             exec(f"from {command} import {command[0].upper()+command[1:]}")
             exec(f"app={command[0].upper()+command[1:]}()")
             try:
                 exec(f"app.run({argument})")
             except:
-                 self.print_err("Wrong argument")
+                 self.print_err("Problem with program execution.")
         except OSError:
-            self.print_err(f"Problem with running {command} program")
+            self.print_err(f"Problem with loading {command} program.")
 
     def unknown_function(self):
         """
@@ -323,7 +320,7 @@ class smolOS:
 
     def edit(self, filename=""):
         """
-        Edit a file in a minimum viable text editor
+        A minimum viable text editor
         """
         file_edited = False
         edit_mode = True
@@ -344,7 +341,7 @@ class smolOS:
         print("\033[7mPress Ctrl+C to quit\033[0m.\n")
         try:
             if filename == "":
-                lines = [""]
+                lines = ["\n"]
                 line_count = len(lines)
                 new_file = True
             else:
@@ -368,14 +365,7 @@ class smolOS:
                         display_name = filename
                         if filename=="":
                             display_name = "NEW UNNAMED FILE"
-
                         print("\033[7m    File:",display_name,"Lines:",line_count," // Use `<` `>` for pagination \033[0m")
-
-                        """
-                        display_lines = ""
-                        for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            display_lines += str(line_num)+": "+line
-                        """
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
                             print(line_num,line, end='')
                 else:
@@ -407,7 +397,7 @@ class smolOS:
 
                 if user_ed_input == "append":
                     line_count += 1
-                    lines.append(" ")
+                    lines.append("\n")
 
                 if user_ed_input == ">":
                     if start_index+UI_PAGE_SIZE < line_count:
@@ -453,19 +443,25 @@ class smolOS:
                         new_lines = int(parts[1])
                         line_count += new_lines
                         for _ in range(new_lines):
-                            lines.append(" ")
+                            lines.append("\n")
                     elif parts[0] == "name":
                         if parts[1] in self.protected_files:
-                            self.print_err("Protected file")
+                            self.print_err("Can not name the file as protected file.")
                         else:
                             filename=parts[1]
                     else:
                         line_number = int(parts[0])
                         new_content = parts[1]
-                        if line_number > 0 and line_number <= line_count:
-                            lines[line_number - 1] = new_content + "\n"
+                        if line_number > 0:
+                            if line_number <= line_count:
+                                lines[line_number - 1] = new_content + "\n"
+                            else:
+                                if self.ask_user("Line number bigger than buffer, append the line at the end of a buffer?"):
+                                    line_count += 1
+                                    lines.append("\n")
+                                    lines[line_count - 1] = new_content + "\n"
                         else:
-                            self.print_err("Invalid line number")
+                            self.print_err("Invalid line number.")
                     file_edited = True
             except KeyboardInterrupt:
                 break
