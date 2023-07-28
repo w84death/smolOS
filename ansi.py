@@ -5,7 +5,7 @@ Template for user programs for smolOS
 Homepage: https://smol.p1x.in/os/
 """
 
-class ANSI:
+class Ansi:
     """
     A class to handle the ANSI escape sequences, text attributes, and colors.
     """
@@ -60,7 +60,7 @@ class ANSI:
         """
         print("\033[0m")
 
-    def show_all(self):
+    def run(self):
         """
         Shows all available attributes.
         """
@@ -73,5 +73,5 @@ class ANSI:
         
         
 if __name__ == '__main__':
-    ansi = ANSI()
-    ansi.show_all()
+    ansi = Ansi()
+    ansi.run()

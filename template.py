@@ -42,8 +42,10 @@ class Template:
         """
         print(f"{self.name} : {message}")
 
+    def run(self):
+        self.loop()
 
 if __name__ == '__main__':
     template = Template()
-    template.loop()
+    template.run()
 
