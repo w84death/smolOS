@@ -26,14 +26,19 @@ class Pixel:
         self.power.value(1)
         self.pixel = neopixel.NeoPixel(machine.Pin(pin), 1)
         self.msg("Initialized.")
-
-
+    
+    def run(self, args=[]):
+        if len(args)>0:
+            self.color(args[0])
+        else:
+            self.color((64, 64, 255))
+            
     def msg(self, message):
         """
         Print a message from the program.
         """
         print(f"{self.name} : {message}")
-
+        
     def color(self, color=((0,0,0))):
         """
         Set the color of the NeoPixel.
@@ -82,5 +87,5 @@ class Pixel:
 
 if __name__ == '__main__':
     pixel = Pixel()
-    pixel.color((64, 64, 255))
+    pixel.run()
 
