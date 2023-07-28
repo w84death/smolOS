@@ -92,7 +92,11 @@ class smolOS:
                         else:
                             self.user_commands[command]()
                     else:
-                        self.try_exec_script(command)
+                        if len(parts) > 1:
+                            arguments = ' '.join(parts[1:])
+                            self.try_exec_script(command,arguments)
+                        else:
+                            self.try_exec_script(command)
             except KeyboardInterrupt:
                 break
 
@@ -280,7 +284,7 @@ class smolOS:
         else:
             self.print_err("No code provided.")
 
-    def run(self, command):
+    def run(self, command, arguments=""):
         """
         Run a program in the system.
         """
@@ -290,7 +294,7 @@ class smolOS:
             #exec(code)
             exec(f"from {command} import {command[0].upper()+command[1:]}")
             exec(f"app={command[0].upper()+command[1:]}()")
-            exec("app.run()")
+            exec(f"app.run(\"{arguments}\")")
         except OSError:
             self.print_err(f"Problem with running {command} program")
 
@@ -300,12 +304,12 @@ class smolOS:
         """
         self.print_err("Unknown function. Type 'help' for list of functions.")
 
-    def try_exec_script(self,command):
+    def try_exec_script(self,command,argument=""):
         """
         Trys to execute a script of a same name as given command
         """
         if f"{command}.py" in uos.listdir():
-            self.run(command)
+            self.run(command,argument)
         else:
             self.unknown_function()
 

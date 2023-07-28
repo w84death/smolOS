@@ -14,6 +14,7 @@ import random
 WORLD_WIDTH = 5
 WORLD_HEIGHT = 5
 DELAY = 0.1
+BLANK_COLOR = (0,0,0)
 BACKGROUND_COLOR = (0, 0, 10)
 FORGROUND_COLOR = (64, 24, 18)
 NEW_COLOR = (12,8,8)
@@ -141,6 +142,8 @@ class Neolife:
                     self.draw_world(NEW_COLOR)
                     utime.sleep(0.5)
             except KeyboardInterrupt:
+                self.pixels.fill(BLANK_COLOR)
+                self.pixels.write()
                 break
 
     def run(self):
