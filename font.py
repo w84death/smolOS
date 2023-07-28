@@ -1,4 +1,9 @@
+"""
+Font for 5x5 NeoPixel display
 
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
 GLYFS = {
     
     "0":"0xeccdc0",

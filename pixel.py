@@ -1,5 +1,5 @@
 """
-Pixel - tools for playing with one NeoPixel
+Tools for playing with one NeoPixel LED
 
 (c)2023/07 Krzysztof Krystian Jankowski
 Homepage: https://smol.p1x.in/os/

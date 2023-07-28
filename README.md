@@ -4,13 +4,13 @@
 smolOS is a tiny and simple operating system for MicroPython giving the user POSIX-like environment to play and research. It came with a set of tools and demos.
 System should run on any MicroPython supproted board but it's tested and developed for XIAO RP2040,
 
-## Latest documentation available at official homepage:
+### Latest documentation available at official homepage:
 - [smolOS homepage (http)](http://smol.p1x.in/os/)
 - [smolOS homepage (https)](https://smol.p1x.in/os/)
 
 ![smolOS XIAO](media/smolos.png)
 
-## Real Life Usecases
+### Real Life Usecases
 
 * listing and removing unwanted files on board
 * checking free space
@@ -18,7 +18,7 @@ System should run on any MicroPython supproted board but it's tested and develop
 * learning basics of disk operating system
 * having fun with microcontrollers
 
-## smolOS Features
+### smolOS Features
 
 * Changes microcontroller into a small working PC
 * Homemade for fun and learning
@@ -30,6 +30,22 @@ System should run on any MicroPython supproted board but it's tested and develop
 * Build on MicroPython with clear code
 * Stability and simplicity are the main principle behind the code
 * Free and open :)
+
+### Additoinal Programs
+
+* ansi - Displays ANSI escape codes
+* life - Game of Life implementation for smolOS (text)
+* buzz - Simple synthezator for 1-bit music (requies a buzzer)
+
+All of those are for NeoPixel Grid 5x5 BFF:
+* duck - Yellow Rubber Duck for programmers
+* neolife - Game of Life implementation
+* pixel - Tools for playing with one LED
+* plasma - Demoscene plasma effect
+* font - Font bitmaps (for scroller)
+* scroller - Scrolls text
+
+
 
 ## Installation
 

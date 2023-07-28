@@ -1,3 +1,9 @@
+"""
+Scrolls text over NeoPixel Grid BFF
+
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
+"""
 import machine
 import utime
 import neopixel

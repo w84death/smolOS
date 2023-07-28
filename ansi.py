@@ -1,5 +1,5 @@
 """
-Template for user programs for smolOS
+Displays ANSI escape sequences
 
 (c)2023/07 Krzysztof Krystian Jankowski
 Homepage: https://smol.p1x.in/os/
