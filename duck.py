@@ -5,8 +5,8 @@ Yellow Rubber Duck for programmers
 Homepage: https://smol.p1x.in/os/
 """
 
+import machine
 import utime
-import time
 import neopixel
 import math
 import random
@@ -99,6 +99,9 @@ class Duck:
             ]
         }
 
+    def run(self):
+        self.hello()
+        
     def draw(self,bitmap):
         """
         Draw a specific frame.
@@ -139,8 +142,7 @@ class Duck:
             utime.sleep(1)
             self.pixels.fill((0,0,0))
             self.pixels.write()
-
-
+        
     def msg(self, message):
         """
         Print a message from the program.
@@ -149,4 +151,4 @@ class Duck:
 
 if __name__ == '__main__':
     duck = Duck()
-    duck.hello()
+    duck.run()
