@@ -11,6 +11,10 @@ import machine
 import uos
 import gc
 import utime
+import neopixel
+import math
+import random
+
 
 # Define constants
 CPU_SPEED_SLOW = 40
@@ -281,9 +285,12 @@ class smolOS:
         Run a program in the system.
         """
         try:
-            with open(command+".py", "r") as file:
-                code = file.read()
-            exec(code)
+            #with open(command+".py", "r") as file:
+            #    code = file.read()
+            #exec(code)
+            exec(f"from {command} import {command[0].upper()+command[1:]}")
+            exec(f"app={command[0].upper()+command[1:]}()")
+            exec("app.run()")
         except OSError:
             self.print_err(f"Problem with running {command} program")
 
