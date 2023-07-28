@@ -10,19 +10,13 @@ import neopixel
 import utime
 
 class Pixel:
-    """
-    A class to handle a single NeoPixel LED.
-    """
     HEARTBEAT_PATTERN = [0, 10, 20, 50, 100, 255, 200, 100, 50, 30, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     BREATHE_DELAY = 0.05
     HEARTBEAT_DELAY = 0.05
 
     def __init__(self, pin=12):
-        """
-        Initialize the NeoPixel object.
-        Changes power on pin 11 for XIAO board
-        """
         self.name = "Pixel"
+        # Changes power on pin 11 for XIAO board
         self.power = machine.Pin(11, machine.Pin.OUT)
         self.power.value(1)
         self.pixel = neopixel.NeoPixel(machine.Pin(pin), 1)

@@ -15,35 +15,38 @@ import neopixel
 import math
 import random
 
-
-# Define constants
-CPU_SPEED_SLOW = 40
-CPU_SPEED_TURBO = 133
+CPU_SPEED_SLOW = 40  # Mhz
+CPU_SPEED_TURBO = 133  # Mhz
 SYSTEM_LED_PIN = 25
-PAGE_SIZE = 10
 
+OS_NAME = "smolOS"
 OS_VERSION = "almost-0.9"
 OS_VARIANT = "xiao"
 OS_BOARD_NAME = "Seeed XIAO RP2040"
+OS_PROMPT = "\nsmol $: "
+OS_START_TURBO = True
 
-# Define smolOS class
+UI_PAGE_SIZE = 20
+
+
 class smolOS:
     """
     A class to handle the smolOS functionalities.
     """
     def __init__(self):
         """
-        Initialize the smolOS object.
+        Initialize the system variables.
         """
-        self.name = "smolOS"
+        self.name = OS_NAME
         self.version = OS_VERSION
         self.version += "-"+OS_VARIANT
         self.board = OS_BOARD_NAME
-        self.cpu_speed_range = {"slow": CPU_SPEED_SLOW, "turbo": CPU_SPEED_TURBO}  # Mhz
+
+        self.cpu_speed_range = {"slow": CPU_SPEED_SLOW, "turbo": CPU_SPEED_TURBO}
         self.system_led = machine.Pin(SYSTEM_LED_PIN, machine.Pin.OUT)
-        self.prompt = "\nsmol $: "
-        self.turbo = True
-        self.protected_files = {"boot.py", "smolos.py"}
+        self.prompt = OS_PROMPT
+        self.turbo = OS_START_TURBO
+        self.protected_files = {"boot.py", "smolos.py", "main.py"}
         self.user_commands = {
             "help": self.help,
             "list": self.list,"ls": self.list,"dir": self.list,
@@ -166,8 +169,6 @@ class smolOS:
         files = uos.listdir()
         for i, file in enumerate(files):
             self.info(file, True)
-            if (i+1) % PAGE_SIZE == 0:
-                input("\033[7m Press Enter to see more\033[0m")
         print("\n\tTotal files: ", len(files))
 
     def show(self, filename=""):
@@ -178,12 +179,16 @@ class smolOS:
             try:
                 i=0
                 with open(filename, "r") as file:
-                    print(file.read())
-                    i+=1
-                    if (i+1) % PAGE_SIZE == 0:
-                        input("\033[7m Press Enter to see more\033[0m")
+                    for line in file:
+                        print(line, end='')
+                        i+=1
+                        if i % UI_PAGE_SIZE == 0:
+                            input("\033[7m Press Enter to see more \033[0m or Ctrl-c to stop.")
+
             except OSError:
                 self.print_err("Cannot open file!")
+            except KeyboardInterrupt:
+                self.print_msg("Interrupted by user.")
         else:
             self.print_err("No filename provided.")
 
@@ -358,7 +363,7 @@ class smolOS:
             try:
                 if edit_mode:
                     if start_index < line_count:
-                        end_index = min(start_index + PAGE_SIZE,line_count)
+                        end_index = min(start_index + UI_PAGE_SIZE,line_count)
                         print_lines = lines[start_index:end_index]
                         display_name = filename
                         if filename=="":
@@ -366,10 +371,13 @@ class smolOS:
 
                         print("\033[7m    File:",display_name,"Lines:",line_count," // Use `<` `>` for pagination \033[0m")
 
+                        """
                         display_lines = ""
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
                             display_lines += str(line_num)+": "+line
-                        print(display_lines)
+                        """
+                        for line_num,line in enumerate(print_lines,start=start_index + 1):
+                            print(line_num,line, end='')
                 else:
                     if show_help:
                         self.man(ed_commands_manual)
@@ -399,17 +407,17 @@ class smolOS:
 
                 if user_ed_input == "append":
                     line_count += 1
-                    lines.append("")
+                    lines.append(" ")
 
                 if user_ed_input == ">":
-                    if start_index+PAGE_SIZE < line_count:
-                        start_index += PAGE_SIZE
+                    if start_index+UI_PAGE_SIZE < line_count:
+                        start_index += UI_PAGE_SIZE
                     else:
                         self.print_msg("There is no next page. This is the last page.")
 
                 if user_ed_input == "<":
-                    if start_index-PAGE_SIZE >= 0:
-                        start_index -= PAGE_SIZE
+                    if start_index-UI_PAGE_SIZE >= 0:
+                        start_index -= UI_PAGE_SIZE
                     else:
                         self.print_msg("Can not go back, it is a first page already.")
 
@@ -445,7 +453,7 @@ class smolOS:
                         new_lines = int(parts[1])
                         line_count += new_lines
                         for _ in range(new_lines):
-                            lines.append("")
+                            lines.append(" ")
                     elif parts[0] == "name":
                         if parts[1] in self.protected_files:
                             self.print_err("Protected file")

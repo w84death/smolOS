@@ -6,13 +6,7 @@ Homepage: https://smol.p1x.in/os/
 """
 
 class Ansi:
-    """
-    A class to handle the ANSI escape sequences, text attributes, and colors.
-    """
     def __init__(self):
-        """
-        Initialize the ANSI object.
-        """
         self.text_attributes = {
             "Bold": "\033[1m",
             "Faint": "\033[2m",
@@ -46,24 +40,15 @@ class Ansi:
         }
 
     def list_sequences(self, title, sequences):
-        """
-        List a set of sequences with a title.
-        """
         print(f"\033[0;1m{title}\033[0m\n")
         for name, code in sequences.items():
             print(f"{code}{name}\t\t{code}\033[0m")
         self.reset_attributes()
 
     def reset_attributes(self):
-        """
-        Reset all attributes.
-        """
         print("\033[0m")
 
     def run(self, argument=""):
-        """
-        Shows all available attributes.
-        """
         print("\n\033[1mANSI Escape Sequences\n")
         print("\033[0mReset all attributes\t\\033[0m\n")
 

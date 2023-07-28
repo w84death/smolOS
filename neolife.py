@@ -20,15 +20,9 @@ FORGROUND_COLOR = (64, 24, 18)
 NEW_COLOR = (12,8,8)
 
 class Neolife:
-    """
-    A class to handle the Life functionalities.
-    """
     def __init__(self):
-        """
-        Initialize the Life object.
-        """
         self.world = []
-        self.temp  = []
+        self.future_world  = []
         self.world_size = WORLD_WIDTH*WORLD_HEIGHT
         self.period = 0
         self.pixels = neopixel.NeoPixel(machine.Pin(29), self.world_size)
@@ -43,7 +37,7 @@ class Neolife:
         """
         for _ in range(self.world_size):
             self.world.append(0)
-            self.temp.append(0)
+            self.future_world.append(0)
 
     def random_seed(self):
         """
@@ -54,14 +48,14 @@ class Neolife:
 
     def update_world(self):
         """
-        Update the world with the temporary world.
+        Update the world with calculated next state of the world
         """
         for i in range(self.world_size):
-            self.world[i] = self.temp[i]
+            self.world[i] = self.future_world[i]
 
     def get_cell_value(self,i):
         """
-        Get the cell value.
+        Returns 0 if asking for a cell outside the world.
         """
         if i<0 or i>=len(self.world):
             return 0
@@ -78,32 +72,52 @@ class Neolife:
         for cell in self.world:
             # Check eight closest cells
             density=0
+
+            # left and right
+            # cell is not on the left edge
             if i%self.world_size-1>0:
                 density += self.get_cell_value(i-1)
+            # cell is not on the right edge
             if i%self.world_size-1<WORLD_WIDTH:
                 density += self.get_cell_value(i+1)
+
+             # top row
             density += self.get_cell_value(i-offset+1)
             density += self.get_cell_value(i-offset)
             density += self.get_cell_value(i-offset-1)
 
+            # bottom row
             density += self.get_cell_value(i+offset+1)
             density += self.get_cell_value(i+offset)
             density += self.get_cell_value(i+offset-1)
 
             # The rules of life..
-            if cell == 1: # Cell is alive
-                if density<2 or density>3: # In overcrouded or to lonely conditions life is no more
-                    self.temp[i] = 0
+            # Cell is alive
+            if cell == 1:
+
+                # In overcrouded or to lonely = life is no more
+                if density<2 or density>3:
+                    self.future_world[i] = 0
                     stable=False
-                else: # In good conditions life is going forward
-                    self.temp[i] = 1
-            if cell == 0: # Cell is empty
-                if density==3: # In good conditions new life is born
-                    self.temp[i] = 1
+
+                # In good conditions life is going forward
+                else:
+                    self.future_world[i] = 1
+
+            # Cell is empty
+            if cell == 0:
+
+                # In good conditions new life is born
+                if density==3:
+                    self.future_world[i] = 1
                     stable=False
-                else: # Still empty
-                    self.temp[i]=0
+
+                # Still empty
+                else:
+                    self.future_world[i]=0
+
             i+=1
+
         return not stable
 
     def draw_world(self, color=FORGROUND_COLOR):
@@ -120,9 +134,6 @@ class Neolife:
         self.pixels.write()
 
     def simulate(self, delay):
-        """
-        Simulate the Game of Life.
-        """
         self.random_seed()
         self.draw_world()
         print("Press Ctrl+C to quit.\n")
@@ -145,8 +156,8 @@ class Neolife:
                 self.pixels.write()
                 break
 
-    def run(self, argument=DELAY):
-        self.simulate(argument)
+    def run(self, delay=DELAY):
+        self.simulate(delay)
 
 if __name__ == '__main__':
     neolife = Neolife()

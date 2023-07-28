@@ -48,14 +48,14 @@ class Life:
 
     def update_world(self):
         """
-        Update the world with the temporary world.
+        Update the world with calculated next state of the world
         """
         for i in range(self.world_size):
-            self.world[i] = self.temp[i]
+            self.world[i] = self.future_world[i]
 
     def get_cell_value(self,i):
         """
-        Get the cell value.
+        Returns 0 if asking for a cell outside the world.
         """
         if i<0 or i>=len(self.world):
             return 0
@@ -66,44 +66,61 @@ class Life:
         Check the world for the next generation.
         """
         i=0
-        off=self.world_width
+        offset=WORLD_WIDTH
         stable = True
 
         for cell in self.world:
             # Check eight closest cells
             density=0
+
+            # left and right
+            # cell is not on the left edge
             if i%self.world_size-1>0:
                 density += self.get_cell_value(i-1)
-            if i%self.world_size-1<self.world_width:
+            # cell is not on the right edge
+            if i%self.world_size-1<WORLD_WIDTH:
                 density += self.get_cell_value(i+1)
-            density += self.get_cell_value(i-off+1)
-            density += self.get_cell_value(i-off)
-            density += self.get_cell_value(i-off-1)
-            
-            density += self.get_cell_value(i+off+1)
-            density += self.get_cell_value(i+off)
-            density += self.get_cell_value(i+off-1)
+
+             # top row
+            density += self.get_cell_value(i-offset+1)
+            density += self.get_cell_value(i-offset)
+            density += self.get_cell_value(i-offset-1)
+
+            # bottom row
+            density += self.get_cell_value(i+offset+1)
+            density += self.get_cell_value(i+offset)
+            density += self.get_cell_value(i+offset-1)
 
             # The rules of life..
-            if cell == 1: # Cell is alive
-                if density<2 or density>3: # In overcrouded or to lonely conditions life is no more
-                    self.temp[i] = 0
+            # Cell is alive
+            if cell == 1:
+
+                # In overcrouded or to lonely = life is no more
+                if density<2 or density>3:
+                    self.future_world[i] = 0
                     stable=False
-                else: # In good conditions life is going forward
-                    self.temp[i] = 1
-            if cell == 0: # Cell is empty
-                if density==3: # In good conditions new life is born
-                    self.temp[i] = 1
+
+                # In good conditions life is going forward
+                else:
+                    self.future_world[i] = 1
+
+            # Cell is empty
+            if cell == 0:
+
+                # In good conditions new life is born
+                if density==3:
+                    self.future_world[i] = 1
                     stable=False
-                else: # Still empty
-                    self.temp[i]=0 
+
+                # Still empty
+                else:
+                    self.future_world[i]=0
+
             i+=1
+
         return not stable
 
     def draw_world(self):
-        """
-        Draw the world.
-        """
         print("\033[2J")
         line = ""
         for cell in range(len(self.world)):
@@ -116,10 +133,7 @@ class Life:
                 line=""
         print("Period:",self.period)
 
-    def run(self, delay=DELAY):
-        """
-        Simulate the Life.
-        """
+    def simulate(self, delay):
         self.random_seed()
         self.draw_world()
         print("Press Ctrl+C to quit.\n")
@@ -136,6 +150,9 @@ class Life:
                     self.period=0
             except KeyboardInterrupt:
                 break
+
+    def run(self, delay=DELAY):
+        self.simulate(delay)
 
 if __name__ == '__main__':
     life = Life()

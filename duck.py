@@ -12,13 +12,7 @@ import math
 import random
 
 class Duck:
-    """
-    A class to handle the Duck functionalities.
-    """
     def __init__(self):
-        """
-        Initialize the Duck object.
-        """
         self.name = "Yellow Duck"
         self.pixels = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((0,0,0))
@@ -100,17 +94,11 @@ class Duck:
         }
         
     def draw(self,bitmap):
-        """
-        Draw a specific frame.
-        """
         for i in range(25):
             self.pixels[24-i]=self.palette[bitmap[i]]
         self.pixels.write()
 
     def hello(self):
-        """
-        Play a duck animation in a new thread.
-        """
         self.msg("Aproching..")
         anim_intro = self.animations["buddy"][:4]
         for frame in anim_intro:
@@ -129,9 +117,6 @@ class Duck:
                 break
 
     def bye(self):
-        """
-        Stop the duck animation.
-        """
         anim_outro = self.animations["buddy"][:4][::-1]
         self.msg("Duck swims away...")
         for frame in anim_outro:
@@ -141,9 +126,6 @@ class Duck:
             self.pixels.write()
         
     def msg(self, message):
-        """
-        Print a message from the program.
-        """
         print(f"{self.name} : {message}")
 
     def run(self, argument=""):

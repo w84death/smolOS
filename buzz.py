@@ -24,13 +24,7 @@ SONGS = [
 ]
 
 class Buzz:
-    """
-    A class to handle the Buzz functionalities.
-    """
     def __init__(self):
-        """
-        Initialize the Buzz object.
-        """
         self.name = "Buzz"
         self.notes = {
             'C': 261,
@@ -46,9 +40,6 @@ class Buzz:
         self.msg("Initialized.")
         
     def play_note(self, note, duration):
-        """
-        Play a specific note for a certain duration.
-        """
         if note != ' ':
             self.buzzer.freq(int(self.notes[note]*0.5))
             self.buzzer.duty_u16(BUZZER_DUTY)
@@ -64,9 +55,6 @@ class Buzz:
         self.buzzer.duty_u16(0)
     
     def demo(self, note_duration):
-        """
-        Play a demo of songs in a new thread.
-        """
         self.msg("Playing demo.\nPress Ctrl+C to stop.\n")
         
         while True:
@@ -90,16 +78,10 @@ class Buzz:
                 break
             
     def stop(self):
-        """
-        Stop the demo.
-        """
         time.sleep(0.1) 
         self.buzzer.duty_u16(0)
 
-    def msg(self, message):
-        """
-        Print a message from the program.
-        """
+    def msg(self, message)
         print(f"{self.name} : {message}")
 
     def run(self, note_duration=NOTE_DURATION):
