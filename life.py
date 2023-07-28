@@ -25,7 +25,6 @@ class Life:
         """
         self.world_width = WORLD_WIDTH
         self.world_height = WORLD_HEIGHT
-        self.delay = DELAY
         self.world = []
         self.temp  = []
         self.world_size = self.world_width*self.world_height
@@ -117,7 +116,7 @@ class Life:
                 line=""
         print("Period:",self.period)
 
-    def run(self):
+    def run(self, delay=DELAY):
         """
         Simulate the Life.
         """
@@ -129,7 +128,7 @@ class Life:
                 if self.check_world():
                     self.update_world()
                     self.draw_world()
-                    utime.sleep(self.delay)
+                    utime.sleep(delay)
                     self.period+=1
                 else:
                     utime.sleep(1)

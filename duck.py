@@ -98,9 +98,6 @@ class Duck:
                 ],
             ]
         }
-
-    def run(self):
-        self.hello()
         
     def draw(self,bitmap):
         """
@@ -148,6 +145,9 @@ class Duck:
         Print a message from the program.
         """
         print(f"{self.name} : {message}")
+
+    def run(self, argument=""):
+        self.hello()
 
 if __name__ == '__main__':
     duck = Duck()

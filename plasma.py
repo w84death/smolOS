@@ -12,7 +12,6 @@ class Plasma():
         self.pixels = neopixel.NeoPixel(machine.Pin(29),5*5)
         self.pixels.fill((0,0,0))
         self.pixels.write()
-        self.brightness = 0.2
         self.hearth_bitmap = [
             0,1,1,0,0,
             1,1,1,1,0,
@@ -22,9 +21,8 @@ class Plasma():
         ]
         print("Plasma initialized.")
 
-    def plasma(self):
+    def plasma(self,zoom):
         time=0
-        zoom=0.33
         pow=0.1
         print("Press Ctrl+C to quit.\n")
         while True:
@@ -45,8 +43,8 @@ class Plasma():
             except KeyboardInterrupt:
                 break
         
-    def run(self):
-        self.plasma()
+    def run(self, argument=0.33):
+        self.plasma(argument)
         
 if __name__ == '__main__':
     plasma = Plasma()

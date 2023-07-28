@@ -60,7 +60,7 @@ class Ansi:
         """
         print("\033[0m")
 
-    def run(self):
+    def run(self, argument=""):
         """
         Shows all available attributes.
         """

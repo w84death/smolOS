@@ -26,12 +26,6 @@ class Pixel:
         self.power.value(1)
         self.pixel = neopixel.NeoPixel(machine.Pin(pin), 1)
         self.msg("Initialized.")
-    
-    def run(self, args=[]):
-        if len(args)>0:
-            self.color(args[0])
-        else:
-            self.color((64, 64, 255))
             
     def msg(self, message):
         """
@@ -84,6 +78,9 @@ class Pixel:
                     utime.sleep(self.BREATHE_DELAY)
             except KeyboardInterrupt:
                 break
+
+    def run(self, color=(64, 64, 255)):
+        self.color(color)
 
 if __name__ == '__main__':
     pixel = Pixel()

@@ -13,7 +13,6 @@ SCREEN_LEN=5*5
         
 class Scroller():
     def __init__(self):
-        self.scroll_running = True
         self.pixels = neopixel.NeoPixel(machine.Pin(29),SCREEN_LEN)
         self.pixels.fill((0,0,0))
         self.pixels.write()
@@ -49,7 +48,7 @@ class Scroller():
     def marquee(self,bitmap,loop=False):
         offset=-SCREEN_LEN
         bit_len=len(bitmap)
-        while self.scroll_running:
+        while True:
             self.draw(bitmap,offset)
             if offset==0 and bit_len == SCREEN_LEN:
                 utime.sleep(PAUSE)

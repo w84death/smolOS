@@ -63,7 +63,7 @@ class Buzz:
         time.sleep(0.05)
         self.buzzer.duty_u16(0)
     
-    def demo(self):
+    def demo(self, note_duration):
         """
         Play a demo of songs in a new thread.
         """
@@ -82,7 +82,7 @@ class Buzz:
                             progress += "_"
                         self.msg(f"\t[{progress}]")
                         for note in song:
-                            self.play_note(note, NOTE_DURATION)
+                            self.play_note(note, note_duration)
                     time.sleep(2)
                     no+=1
             except KeyboardInterrupt:
@@ -102,6 +102,9 @@ class Buzz:
         """
         print(f"{self.name} : {message}")
 
+    def run(self, note_duration=NOTE_DURATION):
+        self.demo(note_duration)
+
 if __name__ == '__main__':
     buzz = Buzz()
-    buzz.demo()
+    buzz.run()

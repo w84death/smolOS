@@ -43,27 +43,27 @@ class smolOS:
         self.system_led = machine.Pin(SYSTEM_LED_PIN, machine.Pin.OUT)
         self.prompt = "\nsmol $: "
         self.turbo = True
-        self.protected_files = {"boot.py", "main.py"}
+        self.protected_files = {"boot.py", "smolos.py"}
         self.user_commands = {
             "help": self.help,
-            "list": self.list,
-            "show": self.show,
-            "remove": self.remove,
-            "clear": self.clear,
+            "list": self.list,"ls": self.list,"dir": self.list,
+            "show": self.show,"cat": self.show,
+            "remove": self.remove,"rm": self.remove,
+            "clear": self.clear,"cls": self.clear,
             "stats": self.stats,
             "turbo": self.toggle_turbo,
-            "edit": self.edit,
+            "edit": self.edit,"ed": self.edit,
             "info": self.info,
             "led": self.led,
             "exe": self.exe
         }
         self.user_commands_manual = {
-            "list": "list files",
-            "show <filename>": "print filename content",
+            "list": "list files (alias: ls, dir)",
+            "show <filename>": "print filename content (alias: cat)",
             "info <filename>": "information about a file",
-            "remove <filename>": "remove a file (be careful!)",
-            "edit <filename>": "text editor, filename is optional",
-            "clear": "clears the screen",
+            "remove <filename>": "remove a file (be careful!) (alias: rm)",
+            "edit <filename>": "text editor, filename is optional (alias ed)",
+            "clear": "clears the screen (alias cls)",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
             "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
@@ -294,7 +294,7 @@ class smolOS:
             #exec(code)
             exec(f"from {command} import {command[0].upper()+command[1:]}")
             exec(f"app={command[0].upper()+command[1:]}()")
-            exec(f"app.run(\"{arguments}\")")
+            exec(f"app.run({arguments})")
         except OSError:
             self.print_err(f"Problem with running {command} program")
 

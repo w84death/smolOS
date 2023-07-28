@@ -27,7 +27,6 @@ class Neolife:
         """
         Initialize the Life object.
         """
-        self.delay = DELAY
         self.world = []
         self.temp  = []
         self.world_size = WORLD_WIDTH*WORLD_HEIGHT
@@ -120,7 +119,7 @@ class Neolife:
             self.pixels[cell] = pixel_color
         self.pixels.write()
 
-    def simulate(self):
+    def simulate(self, delay):
         """
         Simulate the Game of Life.
         """
@@ -133,11 +132,11 @@ class Neolife:
                     self.update_world()
                     for _ in range(3):
                         self.draw_world()
-                        utime.sleep(self.delay)
+                        utime.sleep(delay)
                 else:
                     for _ in range(10):
                         self.draw_world()
-                        utime.sleep(self.delay)
+                        utime.sleep(delay)
                     self.random_seed()
                     self.draw_world(NEW_COLOR)
                     utime.sleep(0.5)
@@ -146,8 +145,8 @@ class Neolife:
                 self.pixels.write()
                 break
 
-    def run(self):
-        self.simulate()
+    def run(self, argument=DELAY):
+        self.simulate(argument)
 
 if __name__ == '__main__':
     neolife = Neolife()
