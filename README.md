@@ -1,12 +1,13 @@
 # smolOS
 ## Specialized Microcontroller-Oriented Lightweight Operating System
 
-smolOS is a tiny and simple operating system for MicroPython giving the user POSIX-like environment to play and research. It came with a set of tools and demos.
-System should run on any MicroPython supproted board but it's tested and developed for XIAO RP2040,
+**smolOS** is a tiny (<20KB, <500LOC) and simple 🧪 research ⚙️ operating system ⌨️ written in 🐍 MicroPython for microcontrollers giving user a POSIX-like 📁 environment to play. It came with a set of 🧰 tools and 🪄 demos.
 
-### Latest documentation available at official homepage:
-- [smolOS homepage (http)](http://smol.p1x.in/os/)
-- [smolOS homepage (https)](https://smol.p1x.in/os/)
+System should run on any MicroPython supproted board but it's tested and developed on Seeed XIAO RP2040,
+
+### Official homepage:
+- [smol.p1x.in/os/ (http)](http://smol.p1x.in/os/)
+- [smol.p1x.in/os/ (https)](https://smol.p1x.in/os/)
 
 ![smolOS XIAO](media/smolos.png)
 
