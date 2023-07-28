@@ -20,6 +20,7 @@ class Pixel:
     def __init__(self, pin=12):
         """
         Initialize the NeoPixel object.
+        Changes power on pin 11 for XIAO board
         """
         self.name = "Pixel"
         self.power = machine.Pin(11, machine.Pin.OUT)
@@ -28,15 +29,9 @@ class Pixel:
         self.msg("Initialized.")
             
     def msg(self, message):
-        """
-        Print a message from the program.
-        """
         print(f"{self.name} : {message}")
         
     def color(self, color=((0,0,0))):
-        """
-        Set the color of the NeoPixel.
-        """
         self.pixel.fill(color)
         self.pixel.write()
         self.msg(f"Color set to: \n\t* Red {color[0]}\n\t* Green {color[1]}\n\t* Blue {color[2]}")
@@ -80,7 +75,11 @@ class Pixel:
                 break
 
     def run(self, color=(64, 64, 255)):
-        self.color(color)
+        if type(color) is tuple:
+             self.color(color)
+        else:
+            self.msg("Wrong color argument. Expected format: (0,0,0)\n")
+        
 
 if __name__ == '__main__':
     pixel = Pixel()

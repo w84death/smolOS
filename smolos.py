@@ -284,7 +284,7 @@ class smolOS:
         else:
             self.print_err("No code provided.")
 
-    def run(self, command, arguments=""):
+    def run(self, command, argument=""):
         """
         Run a program in the system.
         """
@@ -294,7 +294,10 @@ class smolOS:
             #exec(code)
             exec(f"from {command} import {command[0].upper()+command[1:]}")
             exec(f"app={command[0].upper()+command[1:]}()")
-            exec(f"app.run({arguments})")
+            try:
+                exec(f"app.run({argument})")
+            except:
+                 self.print_err("Wrong argument")
         except OSError:
             self.print_err(f"Problem with running {command} program")
 
