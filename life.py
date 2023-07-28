@@ -107,7 +107,6 @@ class Life:
         """
         print("\033[2J")
         line = ""
-        
         for cell in range(len(self.world)):
             if self.world[cell] == 1:
                 line += "█"
@@ -118,14 +117,13 @@ class Life:
                 line=""
         print("Period:",self.period)
 
-    def simulate(self):
+    def run(self):
         """
         Simulate the Life.
         """
-        print("Press Ctrl+C to quit.\n")
         self.random_seed()
         self.draw_world()
-        
+        print("Press Ctrl+C to quit.\n")
         while True:
             try:
                 if self.check_world():
@@ -142,5 +140,6 @@ class Life:
 
 if __name__ == '__main__':
     life = Life()
-    life.simulate()
+    life.run()
+
 
