@@ -13,7 +13,7 @@ import random
 # Define constants
 WORLD_WIDTH = 5
 WORLD_HEIGHT = 5
-DELAY = 0.05
+DELAY = 0.1
 BACKGROUND_COLOR = (0, 0, 10)
 FORGROUND_COLOR = (64, 24, 18)
 NEW_COLOR = (12,8,8)
@@ -32,7 +32,6 @@ class Neolife:
         self.world_size = WORLD_WIDTH*WORLD_HEIGHT
         self.period = 0
         self.pixels = neopixel.NeoPixel(machine.Pin(29), self.world_size)
-        self.disp = []
         self.pixels.fill(BACKGROUND_COLOR)
         self.pixels.write()
 
@@ -45,7 +44,6 @@ class Neolife:
         for _ in range(self.world_size):
             self.world.append(0)
             self.temp.append(0)
-            self.disp.append(0)
 
     def random_seed(self):
         """
