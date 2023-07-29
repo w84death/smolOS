@@ -1,9 +1,3 @@
-"""
-Scrolls text over NeoPixel Grid BFF
-
-(c)2023/07 Krzysztof Krystian Jankowski
-Homepage: https://smol.p1x.in/os/
-"""
 import machine
 import utime
 import neopixel
@@ -16,7 +10,7 @@ FORGROUND_COLOR = (64,12,12)
 DELEAY=0.08
 PAUSE=0.12
 SCREEN_LEN=5*5
-        
+
 class Scroller():
     def __init__(self):
         self.pixels = neopixel.NeoPixel(machine.Pin(29),SCREEN_LEN)
@@ -37,20 +31,20 @@ class Scroller():
             self.pixels[24-i]=pixel_color
         self.pixels.write()
 
+    def get_word_bitmap(self, word):
+        out_glyf = []
+        for letter in word:
+            out_glyf += self.font.get_glyf_bitmap(letter.lower())
+        return out_glyf
+
     def draw_text(self, text=""):
         if text=="":
             return
         print(f"Scrolling text: {text}")
         print("Press Ctrl+C to quit.\n")
-        while True:
-            try:
-                for glyf in text:
-                    self.marquee(self.font.get_glyf_bitmap(glyf.lower()))
-            except KeyboardInterrupt:
-                self.pixels.fill(BLANK_COLOR)
-                self.pixels.write()
-                break
-                
+        for word in text.split(' '):
+            self.marquee(self.get_word_bitmap(word))
+
     def marquee(self,bitmap,loop=False):
         offset=-SCREEN_LEN
         bit_len=len(bitmap)
@@ -61,7 +55,7 @@ class Scroller():
             else:
                 utime.sleep(DELEAY)
             offset += 5
-            if offset >= bit_len:
+            if offset > bit_len:
                 offset=-SCREEN_LEN
                 if not loop:
                     return
@@ -72,3 +66,4 @@ class Scroller():
 if __name__ == '__main__':
     scroller = Scroller()
     scroller.run()
+
