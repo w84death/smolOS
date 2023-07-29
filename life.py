@@ -11,8 +11,8 @@ import math
 import random
 
 # Define constants
-WORLD_WIDTH = 15
-WORLD_HEIGHT = 5
+WORLD_WIDTH = 25
+WORLD_HEIGHT = 8
 DELAY = 0.05
 
 class Life:
@@ -26,7 +26,7 @@ class Life:
         self.world_width = WORLD_WIDTH
         self.world_height = WORLD_HEIGHT
         self.world = []
-        self.temp  = []
+        self.future_world  = []
         self.world_size = self.world_width*self.world_height
         self.period = 0
         self.initialize_world()
@@ -37,7 +37,7 @@ class Life:
         """
         for _ in range(self.world_size):
             self.world.append(0)
-            self.temp.append(0)
+            self.future_world.append(0)
 
     def random_seed(self):
         """
@@ -75,10 +75,10 @@ class Life:
 
             # left and right
             # cell is not on the left edge
-            if i%self.world_size-1>0:
+            if i%WORLD_WIDTH-1>0:
                 density += self.get_cell_value(i-1)
             # cell is not on the right edge
-            if i%self.world_size-1<WORLD_WIDTH:
+            if i%WORLD_WIDTH-1<WORLD_WIDTH:
                 density += self.get_cell_value(i+1)
 
              # top row

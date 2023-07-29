@@ -75,10 +75,10 @@ class Neolife:
 
             # left and right
             # cell is not on the left edge
-            if i%self.world_size-1>0:
+            if i%WORLD_WIDTH-1>0:
                 density += self.get_cell_value(i-1)
             # cell is not on the right edge
-            if i%self.world_size-1<WORLD_WIDTH:
+            if i%WORLD_WIDTH-1<WORLD_WIDTH:
                 density += self.get_cell_value(i+1)
 
              # top row
