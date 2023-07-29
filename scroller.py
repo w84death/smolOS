@@ -17,6 +17,7 @@ class Scroller():
         self.pixels.fill((0,0,0))
         self.pixels.write()
         self.font = Font()
+        self.logging = False
 
     def draw(self,bitmap,offset=0):
         pixel_color = BACKGROUND_COLOR
@@ -37,11 +38,15 @@ class Scroller():
             out_glyf += self.font.get_glyf_bitmap(letter.lower())
         return out_glyf
 
+    def log(self, log):
+        if self.logging:
+            print(log)
+
     def draw_text(self, text=""):
         if text=="":
             return
-        print(f"Scrolling text: {text}")
-        print("Press Ctrl+C to quit.\n")
+        self.log(f"Scrolling text: {text}")
+        self.log("Press Ctrl+C to quit.\n")
         for word in text.split(' '):
             self.marquee(self.get_word_bitmap(word))
 
@@ -65,5 +70,6 @@ class Scroller():
 
 if __name__ == '__main__':
     scroller = Scroller()
+    scroller.logging = True
     scroller.run()
 

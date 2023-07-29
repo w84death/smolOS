@@ -26,7 +26,7 @@ OS_BOARD_NAME = "Seeed XIAO RP2040"
 OS_PROMPT = "\nsmol $: "
 OS_START_TURBO = True
 
-UI_PAGE_SIZE = 20
+UI_PAGE_SIZE = 8
 UI_BOOT_LED_ROUNDS = 4
 
 class smolOS:
@@ -73,7 +73,6 @@ class smolOS:
             "exe <code>": "Running exec(code)",
             "<filename>": "runs user program (without .py)"
         }
-        self.boot()
 
     def boot(self):
         """
@@ -84,25 +83,28 @@ class smolOS:
         self.welcome()
         while True:
             try:
-                user_input = input(self.prompt)
-                parts = user_input.split()
-                if len(parts) > 0:
-                    command = parts[0]
-                    if command in self.user_commands:
-                        if len(parts) > 1:
-                            arguments = parts[1:]
-                            self.user_commands[command](*arguments)
-                        else:
-                            self.user_commands[command]()
-                    else:
-                        if len(parts) > 1:
-                            arguments = ' '.join(parts[1:])
-                            self.try_exec_script(command,arguments)
-                        else:
-                            self.try_exec_script(command)
+                self.REPL()
             except KeyboardInterrupt:
                 break
 
+    def REPL(self):
+        user_input = input(self.prompt)
+        parts = user_input.split()
+        if len(parts) > 0:
+            command = parts[0]
+            if command in self.user_commands:
+                if len(parts) > 1:
+                    arguments = parts[1:]
+                    self.user_commands[command](*arguments)
+                else:
+                    self.user_commands[command]()
+            else:
+                if len(parts) > 1:
+                    arguments = ' '.join(parts[1:])
+                    self.try_exec_script(command,arguments)
+                else:
+                    self.try_exec_script(command)
+                    
     def banner(self):
         """
         Display the smolOS banner.
@@ -365,9 +367,19 @@ class smolOS:
                         display_name = filename
                         if filename=="":
                             display_name = "NEW UNNAMED FILE"
-                        print("\033[7m    File:",display_name,"Lines:",line_count," // Use `<` `>` for pagination \033[0m")
+
+                        if line_count<UI_PAGE_SIZE:
+                            toolbar = ""
+                        elif start_index==0:
+                            toolbar = "Use `>` for next page"
+                        elif line_count-start_index<=UI_PAGE_SIZE:
+                            toolbar = "Use `<` for previous page"
+                        else:
+                             toolbar = "Use `<` and `>` for pagination"
+                        
+                        print(f"\033[7mLine|File:{display_name}|Lines:{line_count}|{toolbar}\033[0m")
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            print(line_num,line, end='')
+                            print(f"{line_num:->4}",line,end='')
                 else:
                     if show_help:
                         self.man(ed_commands_manual)
