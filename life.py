@@ -121,7 +121,6 @@ class Life:
         return not stable
 
     def draw_world(self):
-        print("\033[2J")
         line = ""
         for cell in range(len(self.world)):
             if self.world[cell] == 1:
