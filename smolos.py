@@ -104,7 +104,7 @@ class smolOS:
                     self.try_exec_script(command,arguments)
                 else:
                     self.try_exec_script(command)
-                    
+
     def banner(self):
         """
         Display the smolOS banner.
@@ -153,7 +153,7 @@ class smolOS:
         Print an error message.
         """
         print("\n\033[1;37;41m\t<!>", error, "<!>\t\033[0m")
-        
+
     def ask_user(self, message):
         """
         Inputs user for an yes/no answer.
@@ -162,7 +162,7 @@ class smolOS:
         if answer in ("yes", ""):
             return True
         return False
-    
+
     def list(self):
         """
         List the files in the system.
@@ -291,17 +291,12 @@ class smolOS:
         else:
             self.print_err("No code provided.")
 
-    def run(self, command, argument=""):
+    def run(self, command):
         """
         Run a program in the system.
         """
         try:
-            exec(f"from {command} import {command[0].upper()+command[1:]}")
-            exec(f"app={command[0].upper()+command[1:]}()")
-            try:
-                exec(f"app.run({argument})")
-            except:
-                 self.print_err("Problem with program execution.")
+            exec(f"exec(open('{command}.py').read())")
         except OSError:
             self.print_err(f"Problem with loading {command} program.")
 
@@ -311,12 +306,12 @@ class smolOS:
         """
         self.print_err("Unknown function. Type 'help' for list of functions.")
 
-    def try_exec_script(self,command,argument=""):
+    def try_exec_script(self,command):
         """
         Trys to execute a script of a same name as given command
         """
         if f"{command}.py" in uos.listdir():
-            self.run(command,argument)
+            self.run(command)
         else:
             self.unknown_function()
 
@@ -376,7 +371,7 @@ class smolOS:
                             toolbar = "Use `<` for previous page"
                         else:
                              toolbar = "Use `<` and `>` for pagination"
-                        
+
                         print(f"\033[7mLine|File:{display_name}|Lines:{line_count}|{toolbar}\033[0m")
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
                             print(f"{line_num:->4}",line,end='')
@@ -448,7 +443,7 @@ class smolOS:
                     line_count = len(lines)
                     new_file = True
                     filename = ""
-                    
+
                 parts = user_ed_input.split(" ",1)
                 if len(parts) == 2:
                     if parts[0] == "append":
@@ -484,3 +479,4 @@ Homepage: https://smol.p1x.in/os/
 if __name__ == '__main__':
     os = smolOS()
     os.boot()
+
