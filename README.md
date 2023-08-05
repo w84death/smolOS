@@ -15,8 +15,9 @@ System should run on any MicroPython supproted board but it's tested and develop
 
 * listing and removing unwanted files on board
 * checking free space
+* easy way to write simple programs and run them from the OS
 * quicly iterating parameters for a program
-* learning basics of disk operating system
+* editing small bugs in programs
 * having fun with microcontrollers
 
 ### smolOS Features
@@ -26,7 +27,7 @@ System should run on any MicroPython supproted board but it's tested and develop
 * Super small and fast
 * Easy to use, simillar to MS-DOS, POSIX-like environments
 * List and manipulates files
-* Text editor included (very basic)
+* Text editor included (very basic but capabe)
 * Basic tools and demos included (for NeoPixels, Buzzers, LEDs)
 * Build on MicroPython with clear code
 * Stability and simplicity are the main principle behind the code
@@ -99,10 +100,13 @@ Write `help` for manual :)
 ![smolOS editor](media/edit.png)
 
 ## Missing Features
-Some kind of a roadmap.
-- move/copy files
-- finalized editor (mostly done; last edge-cases to cover)
-- finalized architecture/names (version 0.9 will show final vision)
+Some kind of a roadmap (from high to low priority)
+- rename `show` to `print`
+- check exception for used core instead of class variable
+- os: move/copy files
+- edit: jumping to a line
+- finalized architecture and user programs structure (version 0.9 will show final vision)
+- template for program and expanding os itself
 - good manual
 
 ## Articles
