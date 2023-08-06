@@ -34,19 +34,29 @@ class ByteBeat:
 
     # bytebeat formula
     def bytebeat(self, t):
+        '''
+        #1 Crazy Scientist Tune
         return [
             int((127+128*sin(0.285714*(t&t>>8)+7.71429)*PI2)*.01),
             int((127+128*sin((1.11905*(t>>10)+7.71429+(2*sin(t>>8)))*PI2))),
-            int(31+32*sin((4.8*(t>>11)*PI)))>>4]
+            int(31+32*sin((4.8*(t>>11)*PI)))>>4
+        ]
+        '''
+        #2 Acid techno
+        return [
+            int(t&(1024+t%1024)>>3)>>2, # acid bass
+            int(((10000/(1+t%1024)))), # bum bum
+            int((t>>2)^((t>>4)%883)) # main mellody
+        ]
 
     def start(self):
         while True:
             try:
                 bb=self.bytebeat(self.t)
                 bites = bb[0] | bb[1] | bb[2]
-                self.buzzer.freq(261+bites%255)
+                if(bites%512>10):
+                    self.buzzer.freq(bites%512)
                 self.t += 1
-
                 color = (int(bb[0]%255),int(bb[1]%255),int(bb[2]%255))
                 self.pixels.fill(color)
                 self.pixel.fill(color)
