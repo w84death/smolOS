@@ -10,17 +10,17 @@ import utime
 import math
 import neopixel
 
-sin = math.sin
+
 BUZZER_PIN = 4
 BUZZER_DUTY = 32768
-# For a buzzer, you typically want a 50% duty cycle (65535), which will produce a square wave. This will give you the most balanced and loudest sound for most buzzers.
 PI = 3.1415926535
 PI2 = PI*2
 NEOPIXEL_PIN = 12
 NEOPIXELS_PIN = 29
 
-class ByteBeat:
+sin = math.sin
 
+class ByteBeat:
     def __init__(self):
         self.t = 512
         self.pixel = neopixel.NeoPixel(machine.Pin(NEOPIXEL_PIN), 1)
@@ -49,7 +49,7 @@ class ByteBeat:
             int((t>>2)^((t>>4)%883)) # main mellody
         ]
 
-    def start(self):
+    def play(self):
         while True:
             try:
                 bb=self.bytebeat(self.t)
@@ -74,5 +74,5 @@ class ByteBeat:
 
 if __name__ == "__main__":
     byte_beat = ByteBeat()
-    byte_beat.start()
+    byte_beat.play()
 

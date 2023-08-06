@@ -30,13 +30,7 @@ UI_PAGE_SIZE = 8
 UI_BOOT_LED_ROUNDS = 4
 
 class smolOS:
-    """
-    A class to handle the smolOS functionalities.
-    """
     def __init__(self):
-        """
-        Initialize the system variables.
-        """
         self.name = OS_NAME
         self.version = OS_VERSION
         self.version += "-"+OS_VARIANT
@@ -75,9 +69,6 @@ class smolOS:
         }
 
     def boot(self):
-        """
-        Boot the smolOS.
-        """
         machine.freq(self.cpu_speed_range["turbo"] * 1000000)
         self.clear()
         self.welcome()
@@ -99,16 +90,9 @@ class smolOS:
                 else:
                     self.user_commands[command]()
             else:
-                if len(parts) > 1:
-                    arguments = ' '.join(parts[1:])
-                    self.try_exec_script(command,arguments)
-                else:
-                    self.try_exec_script(command)
+                self.try_exec_script(command)
 
     def banner(self):
-        """
-        Display the smolOS banner.
-        """
         print("\033[1;33;44m                                           ______  _____")
         print("                     _________ ___  ____  / / __ \\/ ___/")
         print("                    / ___/ __ `__ \\/ __ \\/ / / / /\\__ \\ ")
@@ -118,55 +102,34 @@ class smolOS:
         print("                        ~ EST. July of 2023 ~\n\033[0m")
 
     def welcome(self):
-        """
-        Display the welcome message.
-        """
         self.banner()
         self.stats()
         self.led("boot")
         self.print_msg("Type \'help\' for a smol manual.")
 
-    def man(self, manual):
-        """
-        Display the manual.
-        """
-        for cmd, desc in manual.items():
-            print("\t\033[7m" + cmd + "\033[0m -", desc)
-
-    def help(self):
-        """
-        Display the help message.
-        """
-        print(self.name + " version " + self.version + " user commands:\n")
-        self.man(self.user_commands_manual)
-        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski.")
-        print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
-
     def print_msg(self, message):
-        """
-        Print a system message.
-        """
         print("\n\033[1;34;47m\t->",message,"\t\033[0m")
 
     def print_err(self, error):
-        """
-        Print an error message.
-        """
         print("\n\033[1;37;41m\t<!>", error, "<!>\t\033[0m")
 
     def ask_user(self, message):
-        """
-        Inputs user for an yes/no answer.
-        """
         answer = input(message +" [yes]/no: ")
         if answer in ("yes", ""):
             return True
         return False
 
+    def man(self, manual):
+        for cmd, desc in manual.items():
+            print("\t\033[7m" + cmd + "\033[0m -", desc)
+
+    def help(self):
+        print(self.name + " version " + self.version + " user commands:\n")
+        self.man(self.user_commands_manual)
+        print("\n\033[0;32mSystem created by Krzysztof Krystian Jankowski.")
+        print("Source code available at \033[4msmol.p1x.in/os/\033[0m")
+
     def list(self):
-        """
-        List the files in the system.
-        """
         print("Listing files:")
         files = uos.listdir()
         for i, file in enumerate(files):
@@ -174,9 +137,6 @@ class smolOS:
         print("\n\tTotal files: ", len(files))
 
     def show(self, filename=""):
-        """
-        Display the content of a file.
-        """
         if filename:
             try:
                 i=0
@@ -195,9 +155,6 @@ class smolOS:
             self.print_err("No filename provided.")
 
     def remove(self, filename=""):
-        """
-        Remove a file from the system.
-        """
         if filename:
             if filename not in self.protected_files:
                 try:
@@ -211,15 +168,9 @@ class smolOS:
             self.print_err("No filename provided.")
 
     def clear(self):
-        """
-        Clear the system screen.
-        """
         print("\033[2J\033[H", end="")
 
     def stats(self):
-        """
-        Display the system statistics.
-        """
         print("\t\033[0mBoard:\033[1m",self.board)
         print("\t\033[0mMicroPython:\033[1m",uos.uname().release)
         print("\t\033[0m"+self.name + ":\033[1m",self.version,"(size:",uos.stat("smolos.py")[6],"bytes)")
@@ -234,9 +185,6 @@ class smolOS:
         print("\033[0m")
 
     def toggle_turbo(self):
-        """
-        Toggle the CPU speed between turbo and slow.
-        """
         self.turbo = not self.turbo
         if self.turbo:
             machine.freq(self.cpu_speed_range["turbo"] * 1000000)
@@ -246,9 +194,6 @@ class smolOS:
             self.print_msg("CPU speed changed to slow "+str(self.cpu_speed_range["slow"]))
 
     def info(self, filename="", short=False):
-        """
-        Display the information of a file.
-        """
         if filename:
             try:
                 file_info = uos.stat(filename)
@@ -262,9 +207,6 @@ class smolOS:
             self.print_err("No filename provided.")
 
     def led(self, command=""):
-        """
-        Control the system LED.
-        """
         if command in ("on",""):
             self.system_led.value(1)
         elif command == "off":
@@ -280,9 +222,6 @@ class smolOS:
             self.print_err("Invalid LED command!")
 
     def exe(self, code=""):
-        """
-        Execute a code in the system.
-        """
         if code:
             try:
                 exec(code)
@@ -292,24 +231,15 @@ class smolOS:
             self.print_err("No code provided.")
 
     def run(self, command):
-        """
-        Run a program in the system.
-        """
         try:
             exec(f"exec(open('{command}.py').read())")
         except OSError:
             self.print_err(f"Problem with loading {command} program.")
 
     def unknown_function(self):
-        """
-        Handle unknown function calls.
-        """
         self.print_err("Unknown function. Type 'help' for list of functions.")
 
     def try_exec_script(self,command):
-        """
-        Trys to execute a script of a same name as given command
-        """
         if f"{command}.py" in uos.listdir():
             self.run(command)
         else:
@@ -472,10 +402,12 @@ class smolOS:
                     file_edited = True
             except KeyboardInterrupt:
                 break
+
 """
 End of system file.
 Homepage: https://smol.p1x.in/os/
 """
+
 if __name__ == '__main__':
     os = smolOS()
     os.boot()
