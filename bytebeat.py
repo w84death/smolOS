@@ -50,6 +50,9 @@ class ByteBeat:
         ]
 
     def play(self):
+        print("ByteBeat Player")
+        print("Press Ctrl+C to quit.\n")
+        print("\nPlaying: t&(1024+t%1024)>>3)>>2 | ((10000/(1+t%1024))) | (t>>2)^((t>>4)%883)\n")
         while True:
             try:
                 bb=self.bytebeat(self.t)

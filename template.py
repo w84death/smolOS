@@ -21,7 +21,7 @@ class Template:
         self.name = "Template Program"
         self.msg("Program initialized")
 
-    def loop(self, argument):
+    def loop(self):
         """
         Loop where the main logic of the program goes.
         """
@@ -30,7 +30,7 @@ class Template:
         while True:
             try:
                 if t % MESSAGE_INTERVAL == 0:
-                    self.msg(f"Hello, {argument}, {t} second in!")
+                    self.msg(f"Hello... {t} second in!")
                 time.sleep(1)
                 t += 1
             except KeyboardInterrupt:
@@ -42,10 +42,7 @@ class Template:
         """
         print(f"{self.name} : {message}")
 
-    def run(self, argument="World"):
-        self.loop(argument)
-
 if __name__ == '__main__':
     template = Template()
-    template.run()
+    template.loop()
 

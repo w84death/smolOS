@@ -44,7 +44,7 @@ class smolOS:
         self.user_commands = {
             "help": self.help,
             "list": self.list,"ls": self.list,"dir": self.list,
-            "show": self.show,"cat": self.show,
+            "print": self.show,"cat": self.show,
             "remove": self.remove,"rm": self.remove,
             "clear": self.clear,"cls": self.clear,
             "stats": self.stats,
@@ -257,9 +257,14 @@ class smolOS:
             "help": "this help",
             ">": "next page",
             "<": "previous page",
-            "10 <line of text>": "replacing 10-th line with a line of text",
-            "append <lines>": "append new line(s) at the end of a file, default 1",
-            "write or save": "write changes to a file",
+            "<<": "back to first page",
+            ">>": "got to last page",
+            "!<text>": "add line of text to a new line",
+            "<number>": "jumps to that line",
+            "<number> <text>": "replacing 10-th line with a line of text",
+            "line": "append new line at the end of a file",
+            "lines <number>": "append 10 new lines",
+            "save": "write changes to a file",
             "name <filename>": "gives new name to opened file",
             "new": "open new empty file",
             "quit": "quit editor"
@@ -296,20 +301,22 @@ class smolOS:
                         if line_count<UI_PAGE_SIZE:
                             toolbar = ""
                         elif start_index==0:
-                            toolbar = "Use `>` for next page"
+                            toolbar = "| Use `>` for next page"
                         elif line_count-start_index<=UI_PAGE_SIZE:
-                            toolbar = "Use `<` for previous page"
+                            toolbar = "| Use `<` for previous page"
                         else:
-                             toolbar = "Use `<` and `>` for pagination"
+                             toolbar = "| Use `<` and `>` for pagination"
 
-                        print(f"\033[7mLine|File:{display_name}|Lines:{line_count}|{toolbar}\033[0m")
+                        edited=""
+                        if file_edited:
+                            edited=" *edited"
+                        print(f"\033[7mLine|File:{display_name}|Lines:{line_count}{toolbar}{edited}\033[0m")
                         for line_num,line in enumerate(print_lines,start=start_index + 1):
-                            print(f"{line_num:->4}",line,end='')
-                else:
-                    if show_help:
+                            print(f"\033[33m{line_num:->4}\033[0m",line,end='')
+                elif show_help:
                         self.man(ed_commands_manual)
                         print("\n\033[7mHit [return] button\033[0m (or command) to go back to  editing.\n")
-
+                    
                 user_ed_input = input("\ned $: ")
 
                 if user_ed_input =="quit":
@@ -319,36 +326,43 @@ class smolOS:
                         self.print_msg("edit closed")
                         break
 
-                if user_ed_input == "quit!":
+                elif user_ed_input == "quit!":
                     self.print_msg("smolEDitor closed")
                     break
 
-                if user_ed_input == "help":
+                elif user_ed_input == "help":
                     edit_mode = False
                     show_help = True
 
-                if user_ed_input in ("","return"):
+                elif user_ed_input in ("","return"):
                     if not edit_mode:
                         edit_mode = True
                         show_help = False
 
-                if user_ed_input == "append":
+                elif user_ed_input == "line":
                     line_count += 1
                     lines.append("\n")
 
-                if user_ed_input == ">":
+                elif user_ed_input == ">":
                     if start_index+UI_PAGE_SIZE < line_count:
                         start_index += UI_PAGE_SIZE
                     else:
                         self.print_msg("There is no next page. This is the last page.")
 
-                if user_ed_input == "<":
+                elif user_ed_input == "<":
                     if start_index-UI_PAGE_SIZE >= 0:
                         start_index -= UI_PAGE_SIZE
                     else:
                         self.print_msg("Can not go back, it is a first page already.")
 
-                if user_ed_input in ("save","write"):
+                elif user_ed_input == "<<":
+                    start_index = 0
+                    
+                elif user_ed_input == ">>":
+                    if line_count>UI_PAGE_SIZE:
+                        start_index = line_count-UI_PAGE_SIZE
+                    
+                elif user_ed_input in ("save","write"):
                     if filename == "":
                         self.print_err("Your new file has no name. Use `name` followed by a file name and save again.")
                     elif filename in self.protected_files:
@@ -368,38 +382,64 @@ class smolOS:
                             file_edited = False
                             new_file = False
 
-                if user_ed_input == "new":
-                    lines = [""]
-                    line_count = len(lines)
-                    new_file = True
-                    filename = ""
-
-                parts = user_ed_input.split(" ",1)
-                if len(parts) == 2:
-                    if parts[0] == "append":
-                        new_lines = int(parts[1])
-                        line_count += new_lines
-                        for _ in range(new_lines):
-                            lines.append("\n")
-                    elif parts[0] == "name":
-                        if parts[1] in self.protected_files:
-                            self.print_err("Can not name the file as protected file.")
-                        else:
-                            filename=parts[1]
-                    else:
-                        line_number = int(parts[0])
-                        new_content = parts[1]
-                        if line_number > 0:
-                            if line_number <= line_count:
-                                lines[line_number - 1] = new_content + "\n"
-                            else:
-                                if self.ask_user("Line number bigger than buffer, append the line at the end of a buffer?"):
-                                    line_count += 1
-                                    lines.append("\n")
-                                    lines[line_count - 1] = new_content + "\n"
-                        else:
-                            self.print_err("Invalid line number.")
+                elif user_ed_input == "new":
+                    if file_edited:
+                        if self.ask_user("Buffer not saved. Do you want to clear everything? [yes]/no"):
+                            lines = [""]
+                            line_count = len(lines)
+                            new_file = True
+                            filename = ""
+                            file_edited = False
+                
+                elif user_ed_input[0]=="!" and len(user_ed_input)>1:
+                    line_count += 1
+                    lines.append(user_ed_input[1:]+"\n")
                     file_edited = True
+                else:   
+                    parts = user_ed_input.split(" ",1)
+                    if len(parts) == 1:
+                        try:
+                            line_number = int(parts[0])
+                            if line_number > UI_PAGE_SIZE and line_number <= line_count:
+                                start_index = line_number-int(UI_PAGE_SIZE/2)
+                            else:
+                                if line_number > line_count:
+                                    start_index = line_count-1
+                                else:
+                                    start_index = 0
+                        except:
+                            self.print_err("Unknown command")
+                    if len(parts) == 2:
+                        if parts[0] == "lines":
+                            new_lines = int(parts[1])
+                            line_count += new_lines
+                            for _ in range(new_lines):
+                                lines.append("\n")
+                                file_edited = True
+                        elif parts[0] == "name":
+                            if parts[1] in self.protected_files:
+                                self.print_err("Can not name the file as protected file.")
+                            else:
+                                filename=parts[1]
+                        else:
+                            try:
+                                line_number = int(parts[0])
+                                new_content = parts[1]
+                                if line_number > 0:                                
+                                    if line_number <= line_count:
+                                        lines[line_number - 1] = new_content + "\n"
+                                        file_edited = True
+                                    else:
+                                        if self.ask_user("Line number bigger than buffer, append the line at the end of a buffer?"):
+                                            line_count += 1
+                                            lines.append("\n")
+                                            lines[line_count - 1] = new_content + "\n"
+                                            file_edited = True
+                                else:
+                                    self.print_err("Invalid line number.")
+                                
+                            except:
+                                self.print_err("Invalid command.")
             except KeyboardInterrupt:
                 break
 
