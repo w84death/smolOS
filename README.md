@@ -27,7 +27,7 @@ System should run on any MicroPython supproted board but it's tested and develop
 * Super small and fast
 * Easy to use, simillar to MS-DOS, POSIX-like environments
 * List and manipulates files
-* Text editor included (very basic but capabe)
+* Text editor included (very basic but capable)
 * Basic tools and demos included (for NeoPixels, Buzzers, LEDs)
 * Build on MicroPython with clear code
 * Stability and simplicity are the main principle behind the code
@@ -38,6 +38,7 @@ System should run on any MicroPython supproted board but it's tested and develop
 * ansi - Displays ANSI escape codes
 * life - Game of Life implementation for smolOS (text)
 * buzz - Simple synthezator for 1-bit music (requies a buzzer)
+* bytebeat - Implementation of ByteBeat for a buzzer
 
 All of those are for NeoPixel Grid 5x5 BFF:
 * duck - Yellow Rubber Duck for programmers
@@ -46,8 +47,6 @@ All of those are for NeoPixel Grid 5x5 BFF:
 * plasma - Demoscene plasma effect
 * font - Font bitmaps (for scroller)
 * scroller - Scrolls text
-
-
 
 ## Installation
 
@@ -99,21 +98,17 @@ Write `help` for manual :)
 
 ![smolOS editor](media/edit.png)
 
-## Missing Features
+## Intresting forks
+- [smolOS by rbenrax](https://github.com/rbenrax/smolOS) - very nice, goes as close to the POSIX as you can get!
+- [pegasusOS by 047pegasus](https://github.com/047pegasus/pegasusOS) - adds easy networking
+
+## Missing Features / ROADMAP
 Some kind of a roadmap (from high to low priority)
-- rename `show` to `print`
-- check exception for used core instead of class variable
 - os: move/copy files
-- edit: jumping to a line
-- finalized architecture and user programs structure (version 0.9 will show final vision)
-- template for program and expanding os itself
+- (external, threaded programs) check exception for used core instead of class variable
 - good manual
 
 ## Articles
 - [hackster.io](https://www.hackster.io/news/krzysztof-jankowski-s-micropython-based-smolos-puts-a-tiny-posix-like-environment-on-your-esp8266-0c776559152b)
 - [cnx-software.com](https://www.cnx-software.com/2023/07/12/smolos-brings-a-linux-like-command-line-interface-to-esp8266-microcontroller/)
 - [lobste.rs](https://lobste.rs/s/ipztxc/smolos_small_os_for_micropython_on)
-
-## Intresting forks
-- [pegasusOS by 047pegasus](https://github.com/047pegasus/pegasusOS)
-- [smolOS by rbenrax](https://github.com/rbenrax/smolOS)
