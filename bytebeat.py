@@ -11,7 +11,7 @@ import math
 import neopixel
 
 
-BUZZER_PIN = 4
+BUZZER_PIN = 3
 BUZZER_DUTY = 32768
 PI = 3.1415926535
 PI2 = PI*2

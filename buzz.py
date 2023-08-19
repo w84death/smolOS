@@ -81,7 +81,7 @@ class Buzz:
         time.sleep(0.1) 
         self.buzzer.duty_u16(0)
 
-    def msg(self, message)
+    def msg(self, message):
         print(f"{self.name} : {message}")
 
     def run(self, note_duration=NOTE_DURATION):
