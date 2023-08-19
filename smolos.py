@@ -3,8 +3,8 @@ smolOS - tiny operating system for tiny computers
 -------------------------------------------------
 Specialized Microcontroller-Oriented Lightweight Operating System
 
-(c)2023/08 Krzysztof Krystian Jankowski
-Homepage: http(s)://smol.p1x.in/os/
+(c)2023/07 Krzysztof Krystian Jankowski
+Homepage: https://smol.p1x.in/os/
 """
 
 import machine
@@ -15,7 +15,7 @@ import neopixel
 import math
 import random
 
-CPU_SPEED_SLOW = 66  # Mhz
+CPU_SPEED_SLOW = 40  # Mhz
 CPU_SPEED_TURBO = 133  # Mhz
 SYSTEM_LED_PIN = 25
 
@@ -59,15 +59,15 @@ class smolOS:
         }
         self.user_commands_manual = {
             "list": "list files (alias: ls, dir)",
-            "print <filename>": "print filename content (alias: cat)",
-            "info <filename>": "information about a file",
-            "reanme <filename> <new-filename>": "reanmes a file (alias move)",
-            "remove <filename>": "remove a file (be careful!) (alias: rm)",
+            "print <filename>": "prints filename content (alias: cat)",
+            "info <filename>": "prints detailed information about a file",
+            "reanme <filename> <new-filename>": "renames a file (alias move)",
+            "remove <filename>": "removes a file (be careful!) (alias: rm)",
             "edit <filename>": "text editor, filename is optional (alias ed)",
             "clear": "clears the screen (alias cls)",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
-            "free": "available memory",
+            "free": "prints available memory",
             "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
             "exe <code>": "Running exec(code)",
             "<filename>": "runs user program (without .py)",
@@ -291,9 +291,9 @@ class smolOS:
             ">>": "got to last page",
             "!<text>": "add line of text to a new line",
             "<number>": "jumps to that line",
-            "<number> <text>": "replacing 10-th line with a line of text",
+            "<number> <text>": "replacing n-th line with a line of text",
             "line": "append new line at the end of a file",
-            "lines <number>": "append 10 new lines",
+            "lines <number>": "append n-th new lines",
             "save": "write changes to a file",
             "name <filename>": "gives new name to opened file",
             "new": "open new empty file",
