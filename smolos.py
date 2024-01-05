@@ -14,15 +14,19 @@ import utime
 import neopixel
 import math
 import random
+import sys
 
 CPU_SPEED_SLOW = 40  # Mhz
 CPU_SPEED_TURBO = 133  # Mhz
 SYSTEM_LED_PIN = 25
 
+# Adafruit RP2040
+#SYSTEM_LED_PIN = 13
+
 OS_NAME = "smolOS"
 OS_VERSION = "0.9"
-OS_VARIANT = "xiao"
-OS_BOARD_NAME = "Seeed XIAO RP2040"
+OS_VARIANT = sys.platform
+OS_BOARD_NAME = getattr(sys.implementation, '_machine')
 OS_PROMPT = "\nsmol $: "
 OS_START_TURBO = True
 
