@@ -14,15 +14,20 @@ import utime
 import neopixel
 import math
 import random
+import sys
 
 CPU_SPEED_SLOW = 40  # Mhz
 CPU_SPEED_TURBO = 133  # Mhz
 SYSTEM_LED_PIN = 25
 
+
+# Adafruit RP2040
+#SYSTEM_LED_PIN = 13
+
 OS_NAME = "smolOS"
-OS_VERSION = "0.9"
-OS_VARIANT = "xiao"
-OS_BOARD_NAME = "Seeed XIAO RP2040"
+OS_VERSION = "almost-0.9"
+OS_VARIANT = sys.platform
+OS_BOARD_NAME = getattr(sys.implementation, '_machine')
 OS_PROMPT = "\nsmol $: "
 OS_START_TURBO = True
 
@@ -46,34 +51,27 @@ class smolOS:
             "list": self.list,"ls": self.list,"dir": self.list,
             "print": self.show,"cat": self.show,
             "remove": self.remove,"rm": self.remove,
-            "rename": self.move,"move": self.move,
             "clear": self.clear,"cls": self.clear,
             "stats": self.stats,
             "turbo": self.toggle_turbo,
             "edit": self.edit,"ed": self.edit,
             "info": self.info,
             "led": self.led,
-            "exe": self.exe,
-            "free": self.free,
-            ".": self.repeat_last
+            "exe": self.exe
         }
         self.user_commands_manual = {
             "list": "list files (alias: ls, dir)",
-            "print <filename>": "prints filename content (alias: cat)",
-            "info <filename>": "prints detailed information about a file",
-            "reanme <filename> <new-filename>": "renames a file (alias move)",
-            "remove <filename>": "removes a file (be careful!) (alias: rm)",
+            "print <filename>": "print filename content (alias: cat)",
+            "info <filename>": "information about a file",
+            "remove <filename>": "remove a file (be careful!) (alias: rm)",
             "edit <filename>": "text editor, filename is optional (alias ed)",
             "clear": "clears the screen (alias cls)",
             "turbo": "toggles turbo mode (100% vs 50% CPU speed)",
             "stats": "system statistics",
-            "free": "prints available memory",
             "led <command>": "manipulating on-board LED. Commands: `on`, `off`",
             "exe <code>": "Running exec(code)",
-            "<filename>": "runs user program (without .py)",
-            ".": "repeats last command"
+            "<filename>": "runs user program (without .py)"
         }
-        self.last_command = ""
 
     def boot(self):
         machine.freq(self.cpu_speed_range["turbo"] * 1000000)
@@ -81,15 +79,12 @@ class smolOS:
         self.welcome()
         while True:
             try:
-                self.REPL(input(self.prompt))
+                self.REPL()
             except KeyboardInterrupt:
                 break
 
-    def REPL(self,user_input):
-        if user_input == ".":
-            user_input = self.last_command
-        else:
-            self.last_command = user_input
+    def REPL(self):
+        user_input = input(self.prompt)
         parts = user_input.split()
         if len(parts) > 0:
             command = parts[0]
@@ -164,19 +159,6 @@ class smolOS:
         else:
             self.print_err("No filename provided.")
 
-    def move(self, file_a="", file_b=""):
-        if not(file_a=="" or file_b==""):
-            if file_b not in self.protected_files:
-                try:
-                    uos.rename(file_a,file_b)
-                    print(f"File {file_a} renamed to {file_b}.")
-                except OSError:
-                    self.print_err("Cannot rename file!")
-            else:
-                self.print_err("Cannot rename protected file!")
-        else:
-            self.print_err("No filename provided.")
-
     def remove(self, filename=""):
         if filename:
             if filename not in self.protected_files:
@@ -206,10 +188,6 @@ class smolOS:
         print("\t\033[0mUsed space:\033[1m",uos.stat("/")[0],"bytes")
         print("\t\033[0mFree space:\033[1m",uos.statvfs("/")[0] * uos.statvfs("/")[3],"bytes")
         print("\033[0m")
-
-    def free(self):
-        print("Free memory:\n\t\033[1m",gc.mem_free(),"bytes\033[0m")
-        print("\033[0mFree disk space:\n\t\033[1m",uos.statvfs("/")[0] * uos.statvfs("/")[3],"bytes\033[0m")
 
     def toggle_turbo(self):
         self.turbo = not self.turbo
@@ -263,9 +241,6 @@ class smolOS:
         except OSError:
             self.print_err(f"Problem with loading {command} program.")
 
-    def repeat_last(self):
-        self.REPL(self.last_command)
-
     def unknown_function(self):
         self.print_err("Unknown function. Type 'help' for list of functions.")
 
@@ -291,9 +266,9 @@ class smolOS:
             ">>": "got to last page",
             "!<text>": "add line of text to a new line",
             "<number>": "jumps to that line",
-            "<number> <text>": "replacing n-th line with a line of text",
+            "<number> <text>": "replacing 10-th line with a line of text",
             "line": "append new line at the end of a file",
-            "lines <number>": "append n-th new lines",
+            "lines <number>": "append 10 new lines",
             "save": "write changes to a file",
             "name <filename>": "gives new name to opened file",
             "new": "open new empty file",
@@ -346,7 +321,7 @@ class smolOS:
                 elif show_help:
                         self.man(ed_commands_manual)
                         print("\n\033[7mHit [return] button\033[0m (or command) to go back to  editing.\n")
-
+                    
                 user_ed_input = input("\ned $: ")
 
                 if user_ed_input =="quit":
@@ -387,11 +362,11 @@ class smolOS:
 
                 elif user_ed_input == "<<":
                     start_index = 0
-
+                    
                 elif user_ed_input == ">>":
                     if line_count>UI_PAGE_SIZE:
                         start_index = line_count-UI_PAGE_SIZE
-
+                    
                 elif user_ed_input in ("save","write"):
                     if filename == "":
                         self.print_err("Your new file has no name. Use `name` followed by a file name and save again.")
@@ -420,12 +395,12 @@ class smolOS:
                             new_file = True
                             filename = ""
                             file_edited = False
-
+                
                 elif user_ed_input[0]=="!" and len(user_ed_input)>1:
                     line_count += 1
                     lines.append(user_ed_input[1:]+"\n")
                     file_edited = True
-                else:
+                else:   
                     parts = user_ed_input.split(" ",1)
                     if len(parts) == 1:
                         try:
@@ -455,7 +430,7 @@ class smolOS:
                             try:
                                 line_number = int(parts[0])
                                 new_content = parts[1]
-                                if line_number > 0:
+                                if line_number > 0:                                
                                     if line_number <= line_count:
                                         lines[line_number - 1] = new_content + "\n"
                                         file_edited = True
@@ -467,7 +442,7 @@ class smolOS:
                                             file_edited = True
                                 else:
                                     self.print_err("Invalid line number.")
-
+                                
                             except:
                                 self.print_err("Invalid command.")
             except KeyboardInterrupt:
@@ -481,5 +456,4 @@ Homepage: https://smol.p1x.in/os/
 if __name__ == '__main__':
     os = smolOS()
     os.boot()
-
 
