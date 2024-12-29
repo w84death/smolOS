@@ -1,4 +1,4 @@
-# Install smolOS on XIAO RP2040
+# Install smolOS on [XIAO RP2040](https://www.seeedstudio.com/XIAO-RP2040-v1-0-p-5026.html)
 
 DRAFT
 
